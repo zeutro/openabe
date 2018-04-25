@@ -45,6 +45,7 @@ endif
 DEPS_PACKAGES = relic openssl gtest
 ADD_CFLAGS :=
 OS_CXXFLAGS :=
+WITH_BP := 
 
 ifeq ($(OS), Windows_NT)
     RELIC_OS := WINDOWS
