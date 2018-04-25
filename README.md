@@ -4,9 +4,9 @@ OpenABE is a cryptographic library that incorporates a variety of attribute-base
 
 This bundle includes full source code, examples and three main sources of documentation:
 
-1. OpenABE API Guide Document - explains how to install and use the library.
-2. OpenABE Command-Line Utilities Document - shows how to use the included command-line tools, including benchmarking.
-3. OpenABE Design Document - explains in detail the functionalities and algorithms implemented.
+1. [OpenABE API Guide Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-api-doc.pdf) - explains how to install and use the library.
+2. [OpenABE Command-Line Utilities Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf) - shows how to use the included command-line tools, including benchmarking.
+3. [OpenABE Design Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-design-doc.pdf) - explains in detail the functionalities and algorithms implemented.
 
 For more information, visit <http://www.zeutro.com>.
 
@@ -43,7 +43,7 @@ readable by anyone over age 50 with a strong credit score and a job at a local e
 
 OpenABE is a C/C++ software library offering several attribute-based encryption (ABE) schemes together with other core cryptographic functionalities such as authenticated symmetric-key encryption, public key encryption, digital signatures, X.509 certificate handling, key derivation functions, pseudorandom generators and more.
 
-For the full cryptographic technical details inside OpenABE, see the included OpenABE Design Document.
+For the full cryptographic technical details inside OpenABE, see the included [OpenABE Design Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-design-doc.pdf).
 
 Application developers should not need to be cryptographic experts to use ABE. To make OpenABE as secure and user-friendly as possible, the following features are provided by default:
 
