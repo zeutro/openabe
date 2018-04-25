@@ -8,7 +8,7 @@ This bundle includes full source code, examples and three main sources of docume
 2. [OpenABE Command-Line Utilities Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf) - shows how to use the included command-line tools, including benchmarking.
 3. [OpenABE Design Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-design-doc.pdf) - explains in detail the functionalities and algorithms implemented.
 
-For more information, visit <http://www.zeutro.com>.
+OpenABE is developed by [Zeutro](http://www.zeutro.com). The software is available for use under the [AGPL 3.0 license](https://github.com/zeutro/openabe/blob/master/LICENSE). For more information or for other licensing options, please visit <http://www.zeutro.com>.
 
 ## What is Attribute-Based Encryption (ABE)?
 
