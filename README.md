@@ -242,6 +242,14 @@ For example, the command below shows how to benchmark the CCA-secure KP-ABE impl
 	cd src
 	bench_libopenabe KP 10 100 fixed cca
 
+## Developers
+
+We would like to thank the following individuals for their contributions to the development of the OpenABE library:
+
+* J. Ayo Akinyele
+* Matthew D. Green
+* Alan Dunn
+* Michael Rushanan
 
 ## Copyright and License
 
