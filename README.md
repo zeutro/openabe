@@ -5,7 +5,7 @@ OpenABE is a cryptographic library that incorporates a variety of attribute-base
 This bundle includes full source code, examples and three main sources of documentation:
 
 1. [OpenABE API Guide Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-api-doc.pdf) - explains how to install and use the library.
-2. [OpenABE Command-Line Utilities Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf) - shows how to use the included command-line tools, including benchmarking.
+2. [OpenABE CLI Util Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf) - shows how to use the included command-line tools, including benchmarking.
 3. [OpenABE Design Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-design-doc.pdf) - explains in detail the functionalities and algorithms implemented.
 
 OpenABE is developed by [Zeutro](http://www.zeutro.com). The software is available for use under the [AGPL 3.0 license](https://github.com/zeutro/openabe/blob/master/LICENSE). For more information or for other licensing options, please visit <http://www.zeutro.com>.
