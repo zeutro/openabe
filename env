@@ -1,0 +1,59 @@
+
+# Setup environment for Android. 
+if [ $# -eq 2 ]; then
+  ANDROID_NDK_ROOT=$1
+  TOOLCHAIN=$2
+
+  export LIBS="-lgnustl_shared -llog -fexceptions"
+  export CXX="${TOOLCHAIN}/bin/arm-linux-androideabi-g++"
+  export CC="${TOOLCHAIN}/bin/arm-linux-androideabi-gcc"
+  export CXXFLAGS+="-DANDROID=1 -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -I${ANDROID_NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/4.8/include -I${ANDROID_NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi/include -I${ANDROID_NDK_ROOT}/sources/cxx-stl/system/include -I${ANDROID_NDK_ROOT}/platforms/android-14/arch-arm/usr/include ${LIBS}"
+  export CCFLAGS="-I/${TOOLCHAIN}/sysroot/usr/include"
+  export ANDROIDSTL="-L${ANDROID_NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi"
+  export AR="${TOOLCHAIN}/bin/arm-linux-androideabi-ar"
+  export LD="${TOOLCHAIN}/bin/arm-linux-androideabi-ld"
+fi
+
+ZROOT=$(pwd)
+DEPS_INSTALL_ZROOT=${ZROOT}/deps/root
+OABE_LIBS_ROOT=${ZROOT}/root
+
+# get the platform
+REDHAT_RELEASE=/etc/redhat-release
+FEDORA_RELEASE=/etc/fedora-release
+LSB_RELEASE=/etc/lsb-release
+ORACLE_RELEASE=/etc/oracle-release
+SYSTEM_RELEASE=/etc/system-release
+DEBIAN_VERSION=/etc/debian_version
+
+function get_os_family() {
+  if [[ -f "$LSB_RELEASE" ]] && grep -q 'DISTRIB_ID=Ubuntu' $LSB_RELEASE; then
+    export OS_FAMILY="debian"
+  elif [[ -f "$DEBIAN_VERSION" ]]; then
+    export OS_FAMILY="debian"
+  elif [[ -f "$FEDORA_RELEASE" ]]; then
+    export OS_FAMILY="fedora"
+  elif [[ -f "$REDHAT_RELEASE" ]]; then
+    export OS_FAMILY="redhat"
+  else
+    export OS_FAMILY=`uname -s | tr '[:upper:]' '[:lower:]'`
+  fi
+}
+
+export ZROOT
+export DEPS_INSTALL_ZROOT
+export LD_LIBRARY_PATH=${DEPS_INSTALL_ZROOT}/lib:${OABE_LIBS_ROOT}/lib:${LD_LIBRARY_PATH}
+
+OS_NAME=`uname -s`
+if [[ $OS_NAME == "Linux" ]]; then
+   # get the family name if a Linux system
+   get_os_family
+   export OS_FAMILY=$OS_FAMILY
+elif [[ $OS_NAME == "MINGW64_NT-10.0" ]]; then
+   # mingw64 (win 10)
+   export ZML_LIB=with_openssl
+   export OS_FAMILY="windows"
+else
+   export OS_FAMILY=`uname -s | tr '[:upper:]' '[:lower:]'`
+fi
+

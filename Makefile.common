@@ -1,0 +1,161 @@
+# Shared Makefile for 
+
+CC = g++
+CXX = g++
+ifndef LDLIBS
+LDLIBS := -lgtest -lpthread
+endif
+
+DEPS_INSTALL_ZROOT = $(ZROOT)/deps/root
+OABE_LIB_ROOT = $(ZROOT)/root/lib
+INCLUDE_ROOT = $(ZROOT)/root/include
+LOCAL_LIB_ROOT = /usr/local/lib
+LOCAL_INCLUDE = /usr/local/include
+LOCAL_INSTALL_BIN = /usr/local/bin
+
+# Include locations
+#  Dependencies (C/C++)
+CCFLAGS := -I$(DEPS_INSTALL_ZROOT)/include
+CXXFLAGS := -I$(DEPS_INSTALL_ZROOT)/include
+#  Local includes (for generated headers from bison/flex)
+CXXFLAGS += -I$(ZROOT)/src
+#  Common includes (C/C++)
+CCFLAGS += -I$(INCLUDE_ROOT)
+CXXFLAGS += -I$(INCLUDE_ROOT)
+
+RELIC_LIB = -lrelic -lrelic_ec
+GMP_LIB = -lgmp
+SSL_LIB = -lssl
+CRYPTO_LIB = -lcrypto
+RELIC_G =
+# commit: 1e3f62a3823f7e3db9d403f724fd9d66f5b04cf8 (as of 7/18/17)
+OPENSSL_VERSION := 1.1.1-dev
+
+# Set flags for C++ 11
+OLD_GPP = $(shell g++ --version | grep -q 4.6 && echo 1)
+ifeq ($(OLD_GPP), 1)
+    CXX11FLAGS = -std=c++0x
+    CXXFLAGS += $(CXX11FLAGS)
+else
+    CXX11FLAGS = -std=c++11
+    CXXFLAGS += $(CXX11FLAGS)
+endif
+
+# Set shared lib extension for each OS
+DEPS_PACKAGES = relic openssl gtest
+ADD_CFLAGS :=
+OS_CXXFLAGS :=
+
+ifeq ($(OS), Windows_NT)
+    RELIC_OS := WINDOWS
+    # NOTE: relic build still broken for MINGW
+    DEPS_PACKAGES = openssl
+    WITH_BP := "with-bp"
+    OPENSSL_VERSION := 1.1.1-dev-bp
+    COMPILER_VARS := -G "MinGW Makefiles" -DSEED=WCGR
+    CMAKE_VARS := -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe CMAKE_INCLUDE_PATH="/usr/local/include" CMAKE_LIBRARY_PATH="/usr/local/lib"
+    SHLIB := dll
+    GTESTEXT := $(SHLIB)
+    CCFLAGS += -I$(LOCAL_INCLUDE)
+    # No need to set -fPIC for windows as all code is position independent by default.
+    CXXFLAGS += -DGTEST_USE_OWN_TR1_TUPLE=0 -I/usr/local/include/ -I/usr/include
+    SHFLAGS := -nostartfiles
+    OPENSSL_CONFIG := Configure mingw64 shared
+    # needed for static libs
+    OS_OBJS += /mingw64/x86_64-w64-mingw32/lib/dllcrt1.o
+    # for network func
+    OS_LIBS += -lwsock32 -lws2_32
+    #ADD_FLAGS := 
+else
+    OS_NAME = $(shell uname -s)
+    ifeq ($(OS_NAME), Linux)
+       RELIC_OS = LINUX
+       SHFLAGS = -shared
+       SHLIB = so
+       GTESTEXT = $(SHLIB).0
+       ifneq (,$(filter $(OS_FAMILY), fedora redhat))
+           OS_CXXFLAGS +=  -I/usr/include
+           ifeq ($(OS_FAMILY), redhat)
+                OS_CXXFLAGS += -DOS_REDHAT_LINUX
+           else
+                OS_CXXFLAGS += -DOS_FEDORA_LINUX
+           endif
+       endif
+       CXXFLAGS += -fPIC -DGTEST_USE_OWN_TR1_TUPLE=0 $(OS_CXXFLAGS)
+       CCFLAGS += -fPIC
+       OPENSSL_CONFIG = config shared
+       ADD_CFLAGS += -Wno-implicit-function-declaration
+    endif
+    ifeq ($(OS_NAME), Darwin)
+       RELIC_OS = MACOSX
+       SHFLAGS = -dynamiclib -current_version 1.0 -compatibility_version 1.0
+       SHLIB = dylib
+       GTESTEXT = 0.$(SHLIB)
+       # pull in headers installed via brew (for gmp/relic/openssl)
+       CXXFLAGS += -I$(LOCAL_INCLUDE)
+       # include the clang C++ standard library (as a result, enable TR1_TUPLE flag)
+       CXXFLAGS += -stdlib=libc++ -DGTEST_USE_OWN_TR1_TUPLE=1 -Wno-deprecated
+       # (Option to use GMP with OpenSSL?): -DOPENSSL_USE_GMP -lgmp
+       OPENSSL_CONFIG := Configure darwin64-x86_64-cc shared
+       ADD_CFLAGS += -Wno-implicit-function-declaration -Wno-macro-redefined
+    endif
+    # TODO: add check for ARM, etc
+endif
+
+PTHREAD_LIB = -lpthread
+
+# Other flags
+CXXFLAGS += -pthread
+# Warnings/errors, for now turn off one warning as this makes ztk unusable
+CXXFLAGS += -Wall
+# Avoid integer overflow issues with these flags
+# -Wtype-limits
+CXXFLAGS += -fstrict-overflow -Wsign-compare
+
+# Add debug symbols (we must remove these in a production build)
+CXXFLAGS += -g -O2 
+# uncomment to enable Address sanitizer 
+#CXXFLAGS += -fsanitize=address -ggdb
+# uncomment to switch to afl-fuzz
+# CC="afl-gcc" # for linux
+# CXX="afl-g++"
+# CC="afl-clang" # for mac
+# CXX="afl-clang++"
+
+LDFLAGS += -L$(DEPS_INSTALL_ZROOT)/lib -L$(OABE_LIB_ROOT) -L$(LOCAL_LIB_ROOT)
+
+# Zeutro Math library config: RELIC vs OPENSSL
+# Look for environment variable ZML_LIB=with_openssl
+OPENSSL_ZML = -DSSL_LIB_INIT
+ifeq ($(ZML_LIB), with_openssl)
+  # openssl-only build for math ops
+  OPENSSL_ZML += -DBP_WITH_OPENSSL
+  CXXFLAGS += $(OPENSSL_ZML)
+  CCFLAGS += -g -O2 $(OPENSSL_ZML)
+else
+  # relic-only build for math ops
+  CXXFLAGS += $(OPENSSL_ZML)
+  CCFLAGS += -g -O2 $(OPENSSL_ZML) $(ADD_CFLAGS) 
+  OABELDLIBS = $(RELIC_LIB)
+  OABELDSHLIBS = $(RELIC_LIB)
+endif
+# remaining deps
+OABELDLIBS += $(SSL_LIB) $(CRYPTO_LIB)
+OABELDSHLIBS += $(SSL_LIB) $(CRYPTO_LIB)
+
+SHLIB_PATH = $(LDFLAGS)
+
+.DEFAULT_GOAL = all
+
+define COMMON_LIB_template
+$(1): $(1)($$($(1)_OBJS))
+	mkdir -p $(OABE_LIB_ROOT)
+	cp $$@ $(OABE_LIB_ROOT)
+	mkdir -p $(INCLUDE_ROOT)
+	-cp -r include/* $(INCLUDE_ROOT)
+endef
+
+# COMMON_LIBS, and the objects they use must be defined *before* this
+# file is included!
+$(foreach library, $(COMMON_LIBS), \
+	$(eval $(call COMMON_LIB_template,$(library))))
