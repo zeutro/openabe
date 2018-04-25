@@ -242,14 +242,16 @@ For example, the command below shows how to benchmark the CCA-secure KP-ABE impl
 	cd src
 	bench_libopenabe KP 10 100 fixed cca
 
-## Cryptographic Design
+## Contributions
+
+### Cryptographic Design
 
 * Brent Waters
 * Matthew Green
 * Susan Hohenberger Waters
 * J. Ayo Akinyele
 
-## Software Design and Development
+### Software Design and Development
 
 * J. Ayo Akinyele
 * Matthew D. Green
