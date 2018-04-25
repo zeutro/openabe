@@ -218,6 +218,31 @@ You can also execute the example that demonstrates use of the keystore with ABE 
 	
 	./test_km
 
+## Benchmarking
+
+The OpenABE is built on top of the abstract Zeutro Math library which supplies all of our elliptic-curve operations.  We instantiate our schemes using the state-of-the-art Barreto-Naehrig (BN) curves with the embedding degree `k = 12` (or commonly referred to as `BN-254`). This particular asymmetric curve is known to yield a very efficient pairing implementation and a security level equivalent to `AES-128`. As a result, this boosts the overall performance of ABE scheme implementations over prior efforts. Other benefits of BN curves include the ability to compress the representation of group elements. This directly translates to making ABE ciphertexts more compact which considerably reduces transmission costs.
+
+We include a benchmark utility for all the ABE schemes provided in the OpenABE:
+
+	Math Library: RELIC
+	OpenABE benchmark utility, v1.0
+	Usage bench_libopenabe: [ scheme => 'CP' or 'KP' ] [ iterations ] \
+	               [ attributes ] [ 'fixed' or 'range' ] [ 'cpa' or 'cca']
+	-scheme: the type of ABE scheme to benchmark
+	-iterations: the number of iterations per test
+	-attributes: the number of attributes in the policy or \
+                     attribute list for encryption
+	-'fixed' or 'range': run with a fixed number of attributes \
+	                     or as a range from 1 to num. attributes
+	-'cpa' or 'cca': chosen-plaintext secure vs chosen-ciphertext \
+	                 secure versions
+
+For example, the command below shows how to benchmark the CCA-secure KP-ABE implementation with 100 attributes for encryption (averaged over 10 iterations). Moreover, the generated decryption key policy will have 100 attributes and each attribute will be involved in the decryption.
+
+	cd src
+	bench_libopenabe KP 10 100 fixed cca
+
+
 ## Copyright and License
 
 Copyright (c) 2018 Zeutro, LLC. All rights reserved.
