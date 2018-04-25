@@ -571,6 +571,6 @@ int main(int argc, const char *argv[])
   outfile0.close();
   cout << "Writing " << data_json.size() << " bytes to " << output_file << "." << endl;
 
-	return 0;
+  return 0;
 }
 

@@ -251,7 +251,6 @@ OpenABE is free software: you can redistribute it and/or modify it under the ter
 
 OpenABE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
 
-You can be released from the requirements of the GNU Affero General Public License and obtain additional features by purchasing a commercial license.   
-Buying such a license is mandatory if you engage in commercial activities involving OpenABE that do not comply with the open source requirements of the GNU Affero General Public License. 
+You can be released from the requirements of the GNU Affero General Public License and obtain additional features by purchasing a commercial license. Buying such a license is mandatory if you engage in commercial activities involving OpenABE that do not comply with the open source requirements of the GNU Affero General Public License. 
 
 For more information on commercial licenses, visit <http://www.zeutro.com>.
