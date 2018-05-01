@@ -75,7 +75,7 @@ This section describes the installation of the OpenABE source code (`libopenabe-
 To compile OpenABE on Ubuntu or Debian Linux-based distro, first run the `deps/install_pkgs.sh` script from the source directory to install the OpenABE system-specific dependencies as follows:
 	
 	cd libopenabe-1.0.0/
-	sudo ./deps/install_pkgs.sh
+	sudo -E ./deps/install_pkgs.sh
 
 Note that you only have to do this once per system setup. After completion, you can proceed to compile the OpenABE as follows:
 
@@ -85,7 +85,7 @@ Note that you only have to do this once per system setup. After completion, you 
 
 All the unit tests should pass at this point and you can proceed to install the OpenABE in a standard location (`/usr/local`) as follows:
 
-	sudo make install
+	sudo -E make install
 
 To change the installation path prefix, modify the `INSTALL_PREFIX` variable in `libopenabe-1.0.0/Makefile`.
 
@@ -124,7 +124,7 @@ Note that you only have to do this once per system setup. After completion, you 
 
 All the unit tests should pass at this point and you can proceed to install the OpenABE in a standard location (`/usr/local`) as follows:
 
-	sudo make install
+	sudo -E make install
 
 To change the installation path prefix, modify the `INSTALL_PREFIX` variable in `libopenabe-1.0.0/Makefile`.
 
@@ -255,7 +255,7 @@ For example, the command below shows how to benchmark the CCA-secure KP-ABE impl
 
 * J. Ayo Akinyele
 * Matthew D. Green
-* Alan Dunn
+* Alan M. Dunn
 * Michael Rushanan
 
 ## Copyright and License
