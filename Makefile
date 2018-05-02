@@ -37,7 +37,10 @@ install: install-deps
 	cp -r $(ZROOT)/root/include $(INSTALL_PREFIX)
 	install -m 755 $(ZROOT)/src/bench_libopenabe $(INSTALL_PREFIX)/bin
 	install -m 755 $(ZROOT)/src/profile_libopenabe $(INSTALL_PREFIX)/bin
-	install -m 755 $(ZROOT)/cli/oabe_{setup,keygen,enc,dec} $(INSTALL_PREFIX)/bin
+	install -m 755 $(ZROOT)/cli/oabe_setup $(INSTALL_PREFIX)/bin
+	install -m 755 $(ZROOT)/cli/oabe_keygen $(INSTALL_PREFIX)/bin
+	install -m 755 $(ZROOT)/cli/oabe_enc $(INSTALL_PREFIX)/bin
+	install -m 755 $(ZROOT)/cli/oabe_dec $(INSTALL_PREFIX)/bin
 	
 test:
 	(cd src && ./test_libopenabe) || exit 1
