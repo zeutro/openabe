@@ -1,4 +1,4 @@
-.PHONY: all clean deps src cli examples
+.PHONY: all clean deps src cli examples bindings
 
 all: check-env deps src cli examples
 
@@ -24,6 +24,9 @@ cli:
 
 examples:
 	$(MAKE) -C examples
+
+bindings:
+	$(MAKE) -C bindings
 
 install-deps:
 	mkdir -p $(INSTALL_PREFIX)
