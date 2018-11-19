@@ -119,26 +119,26 @@ cdef class PyABEContext:
         return msk
 
     def importPublicParams(self, keyBlob):
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importPublicParams(key)
 
     def importPublicParams(self, authID, keyBlob):
         cdef string auth_id = to_bytes(authID)
-        cdef string key = string(b"")
-        return self.thisptr.importPublicParams(authID, key)
+        cdef string key = to_bytes(keyBlob)
+        return self.thisptr.importPublicParams(auth_id, key)
 
     def importSecretParams(self, keyBlob):
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importSecretParams(key)
 
     def importSecretParams(self, authID, keyBlob):
         cdef string auth_id = to_bytes(authID)
-        cdef string key = string(b"")
-        return self.thisptr.importSecretParams(authID, key)
+        cdef string key = to_bytes(keyBlob)
+        return self.thisptr.importSecretParams(auth_id, key)
 
     def importUserKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importUserKey(key_id, key)
 
     def exportUserKey(self, keyID):
@@ -201,12 +201,12 @@ cdef class PyPKEContext:
 
     def importPublicKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importPublicKey(key_id, key)
 
     def importPrivateKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importPrivateKey(key_id, key)
 
     def keygen(self, keyID):
@@ -257,12 +257,12 @@ cdef class PyPKSIGContext:
 
     def importPublicKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importPublicKey(key_id, key)
 
     def importPrivateKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)
-        cdef string key = string(b"")
+        cdef string key = to_bytes(keyBlob)
         return self.thisptr.importPrivateKey(key_id, key)
 
     def keygen(self, keyID):

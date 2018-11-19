@@ -18,6 +18,26 @@ print("ABE CT: ", len(ct))
 pt2 = cpabe.decrypt("alice", ct)
 print("PT: ", pt2)
 assert pt1 == pt2, "Didn't recover the message!"
+
+print("Testing key import")
+
+msk = cpabe.exportSecretParams()
+mpk = cpabe.exportPublicParams()
+uk = cpabe.exportUserKey("alice")
+
+cpabe2 = openabe.CreateABEContext("CP-ABE")
+
+cpabe2.importSecretParams(msk)
+cpabe2.importPublicParams(mpk)
+cpabe2.importUserKey("alice", uk)
+
+ct = cpabe2.encrypt("((one or two) and three)", pt1)
+print("ABE CT: ", len(ct))
+
+pt2 = cpabe2.decrypt("alice", ct)
+print("PT: ", pt2)
+assert pt1 == pt2, "Didn't recover the message!"
+
 print("CP-ABE Success!")
 
 
@@ -58,7 +78,22 @@ print("KP-ABE CT size: ", len(ct))
 pt2 = kpabe.decrypt("bob", ct)
 print("PT: ", pt2)
 assert pt1 == pt2, "Didn't recover the message!"
+
+print("Testing key imports")
+msk = kpabe.exportSecretParams()
+mpk = kpabe.exportPublicParams()
+uk = kpabe.exportUserKey("bob")
+
+kpabe2 = openabe.CreateABEContext("KP-ABE")
+
+kpabe2.importSecretParams(msk)
+kpabe2.importPublicParams(mpk)
+kpabe2.importUserKey("bob", uk)
+
+ct = kpabe.encrypt("|one|date=February 1, 2018|two", pt1)
+print("KP-ABE CT size: ", len(ct))
+pt2 = kpabe.decrypt("bob", ct)
+assert pt1 == pt2, "Didn't recover the message!"
+
 print("KP-ABE Success!")
-
-
 print("All tests passed!")
