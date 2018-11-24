@@ -87,7 +87,11 @@ class PyOpenABEError(Exception):
 
 def to_bytes(obj):
     if type(obj) in [str, unicode]:
-        return obj.encode('utf8')
+        try:
+          enc_obj = obj.encode('UTF-8')
+        except:
+          return obj
+        return enc_obj
     elif type(obj) == bytes:
         return obj
     else:
@@ -275,7 +279,7 @@ cdef class PyPKSIGContext:
         cdef string sig = string(b"")
         try:
             self.thisptr.sign(key_id, msg, sig)
-            return sig.decode('utf8')
+            return sig.decode('UTF-8')
         except RuntimeError as e:
             raise PyOpenABEError(str(e))
 
