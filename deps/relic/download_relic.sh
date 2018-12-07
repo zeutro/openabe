@@ -24,12 +24,12 @@ if [[ ! -f ${RELIC}.${FORMAT} ]]; then
    tar -xf ../${RELIC}.test.${FORMAT}
 
    echo "Fix symbols..."
-   grep -rl "MIN" ./ | xargs sed -i 's/MIN/RLC_MIN/g'
-   grep -rl "MAX" ./ | xargs sed -i 's/MAX/RLC_MAX/g'
-   grep -rl "ALIGN" ./ | xargs sed -i 's/ALIGN/RLC_ALIGN/g'
-   grep -rl "rsa_t" ./ | xargs sed -i 's/rsa_t/rlc_rsa_t/g'
-   grep -rl "rsa_st" ./ | xargs sed -i 's/rsa_st/rlc_rsa_st/g'
-   sed -i -e '/^#define ep2_mul /d' include/relic_label.h
+   grep -rl "MIN" ./ | xargs sed --in-place 's/MIN/RLC_MIN/g'
+   grep -rl "MAX" ./ | xargs sed --in-place 's/MAX/RLC_MAX/g'
+   grep -rl "ALIGN" ./ | xargs sed --in-place 's/ALIGN/RLC_ALIGN/g'
+   grep -rl "rsa_t" ./ | xargs sed --in-place 's/rsa_t/rlc_rsa_t/g'
+   grep -rl "rsa_st" ./ | xargs sed --in-place 's/rsa_st/rlc_rsa_st/g'
+   sed --in-place -e '/^#define ep2_mul /d' include/relic_label.h
 
    cd ..
    tar -czf ${RELIC}.${FORMAT} ${RELIC}
