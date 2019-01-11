@@ -281,6 +281,7 @@ function main_redhat() {
   install_package python3-pip  
   upgrade_cmake
   upgrade_bison
+  echo "/usr/local/lib" > /etc/ld.so.conf.d/libztk.conf
   
   sudo ldconfig
 }
