@@ -151,6 +151,12 @@ function upgrade_cmake() {
      if [[ $CMAKE_VERS -gt 30 ]]; then
         echo "[+] cmake version greater than or equal to 3.1. skipping upgrade."
         return 0
+     else # in case, already installed as cmake3 instead
+        CMAKE3_VERS=`cmake3 --version | grep version | cut -b 16-18 | tr -d [.]`
+        if [[ $CMAKE3_VERS -gt 30 ]]; then
+            echo "[+] cmake3 version greater than or equal to 3.1. skipping upgrade."
+            return 0	
+	fi
      fi
   fi
 
@@ -259,10 +265,13 @@ function main_redhat() {
   yum -y update
   yum install -y centos-release-scl
   yum install -y devtoolset-3-toolchain
+  yum install -y epel-release
   
   install_package wget
   install_package autoconf
   install_package m4
+  install_package cmake3
+  ln -s `which cmake3` /usr/bin/cmake
   install_package libtool
   install_package gcc
   install_package gcc-c++
