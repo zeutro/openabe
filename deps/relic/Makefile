@@ -2,8 +2,7 @@
 
 include ../../Makefile.common
 
-# RELIC commit 955ed39 (4/2/17) = toolkit-0.4.1h (unofficially)
-VERSION=toolkit-0.4.1h
+VERSION=toolkit-0.5.0
 BP_LABEL=bp
 BP_TMP=$(shell mktemp -d tmp$(BP_LABEL)-XXXX)
 BP_HDR_PREFIX=_$(BP_LABEL)

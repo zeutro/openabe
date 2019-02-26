@@ -1,12 +1,12 @@
 #!/bin/bash
 
-VERSION=0.4.1h
+VERSION=0.5.0
 FORMAT=tar.gz
 LINK=https://github.com/relic-toolkit/relic
 RELIC=${1:-relic-toolkit-${VERSION}}
-# commit as of 4/2/2018
-# comment 'Merge pull request #73'
-COMMIT=6609c924395ab6a48955c74558dda38b638b5cba
+# commit of as of 1/9/2019
+# comment 'Update LABEL with recent changes'
+COMMIT=b984e901ba78c83ea4093ea96addd13628c8c2d0
 
 echo "Clone github repo @ ${LINK}"
 git clone ${LINK} ${RELIC}.git
