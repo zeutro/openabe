@@ -281,13 +281,13 @@ function main_redhat() {
   install_package unzip
   install_package glib-devel
   install_package doxygen
-  install_package python3
+  install_package python36
   install_package python-pip
   install_package python-devel
   install_package python-setuptools  
-  install_package python3-setuptools
-  install_package python3-devel
-  install_package python3-pip  
+  install_package python36-setuptools
+  install_package python36-devel
+  install_package python36-pip  
   upgrade_cmake
   upgrade_bison
   echo "/usr/local/lib" > /etc/ld.so.conf.d/libztk.conf
