@@ -268,4 +268,4 @@ OpenABE is distributed in the hope that it will be useful, but WITHOUT ANY WARRA
 
 You can be released from the requirements of the GNU Affero General Public License and obtain additional features by purchasing a commercial license. Buying such a license is mandatory if you engage in commercial activities involving OpenABE that do not comply with the open source requirements of the GNU Affero General Public License. 
 
-For more information on commercial licenses, visit <http://www.zeutro.com>.
+For more information on licensing, visit <http://www.zeutro.com>.
