@@ -13,6 +13,7 @@ LSB_RELEASE=/etc/lsb-release
 ORACLE_RELEASE=/etc/oracle-release
 SYSTEM_RELEASE=/etc/system-release
 DEBIAN_VERSION=/etc/debian_version
+
 function console() {
   echo "[+] $1"
 }
@@ -179,25 +180,28 @@ function upgrade_cmake() {
 }
 
 function upgrade_bison() {
-  BISON30=bison-3.0
-  BISON_URL=https://ftp.gnu.org/gnu/bison/${BISON30}.tar.gz
+  mkdir -p deps/bison
+  cd deps/bison
+  BISON33=bison-3.3
+  BISON_URL=https://ftp.gnu.org/gnu/bison/${BISON33}.tar.gz
  
   # check the existing version first
-  BISON_VERSION=`bison --version | grep Bison | cut -b 19-21 | tr -d [.]`
-  if [[ ${BISON_VERSION} -ge 30 ]]; then
-     echo "[+] bison version is 3.0 or greater. skipping upgrade"
+  BISON_VERSION=$($ZROOT/bin/bison --version | grep Bison | cut -b 19-21 | tr -d [.])
+  if [[ ${BISON_VERSION} -ge 33 ]]; then
+     echo "[+] bison version is 3.3 or greater. skipping upgrade"
      return 0
   fi
 
-  if [[ ! -f ${BISON30}/.built ]]; then
+  if [[ ! -f ${BISON33}/.built ]]; then
      wget ${BISON_URL}
-     tar xf ${BISON30}.tar.gz
-     cd ${BISON30}
-     ./configure
+     tar xf ${BISON33}.tar.gz
+     cd ${BISON33}
+     ./configure --prefix $ZROOT
      make install
      touch .built
      cd ..
   fi
+  cd ../..
 }
 
 # packages needed for Linux/Ubuntu distro
@@ -262,7 +266,6 @@ function main_debian() {
 
 function main_redhat() {
     
-  yum -y update
   yum install -y centos-release-scl
   yum install -y devtoolset-3-toolchain
   yum install -y epel-release
@@ -297,7 +300,6 @@ function main_redhat() {
 
 function main_fedora() {
     
-  yum -y update
   
   install_package wget
   install_package autoconf
@@ -334,6 +336,9 @@ function main() {
     printf "VER:\t$OS_VERSION\n"
     return 0
   fi
+
+  mkdir $ZROOT/bin
+  ln -s $(which bison) $ZROOT/bin/bison
 
   if [[ $OS = "ubuntu" ]]; then
     log "Detected Ubuntu ($OS_VERSION)"
