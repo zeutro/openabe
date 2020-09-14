@@ -51,9 +51,7 @@ Application developers should not need to be cryptographic experts to use ABE. T
 2.  Chosen Ciphertext Attack (CCA) Secure: Prevents serious and practical tampering attacks; most existing schemes in the academic literature only satisfy a weaker security notion (CPA-security).
 3.  Unrestricted Attributes: Attributes can be represented by any string (alternative: must enumerate every current and future attribute at system initialization) and can be used an unlimited number of times in a policy.
 
-OpenABE comes with support for efficient and optimized implementations of content-based and role-based ABE schemes. If your application requires multi-authority ABE (Zeutro's US Patent No. 8516244), that is available as part of a larger library called Zeutro's Toolkit (ZTK) that is available for commercial license.
-
-OpenABE comes with support for efficiently managing an ABE keystore (e.g., a method for storing and selecting private ABE keys for decryption of ABE ciphertexts), which is an essential part of any practical ABE implementation.   See Zeutro's US Patent No. 9209974.
+OpenABE comes with support for efficient and optimized implementations of content-based and role-based ABE schemes. 
 
 For the full cryptographic technical details inside OpenABE, see the included OpenABE Design Document.
 
