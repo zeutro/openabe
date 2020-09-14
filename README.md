@@ -8,7 +8,7 @@ This bundle includes full source code, examples and three main sources of docume
 2. [OpenABE CLI Util Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf) - shows how to use the included command-line tools, including benchmarking.
 3. [OpenABE Design Document](https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-design-doc.pdf) - explains in detail the functionalities and algorithms implemented.
 
-OpenABE is developed by [Zeutro](http://www.zeutro.com). The software is available for use under the [AGPL 3.0 license](https://github.com/zeutro/openabe/blob/master/LICENSE). For more information or for other licensing options, please visit <http://www.zeutro.com>.
+OpenABE is developed by [Zeutro](http://www.zeutro.com). The software is available for use under the [AGPL 3.0 license](https://github.com/zeutro/openabe/blob/master/LICENSE).
 
 ## What is Attribute-Based Encryption (ABE)?
 
@@ -260,7 +260,7 @@ For example, the command below shows how to benchmark the CCA-secure KP-ABE impl
 
 ## Copyright and License
 
-Copyright (c) 2018 Zeutro, LLC. All rights reserved.
+Copyright (c) 2020 Zeutro, LLC. All rights reserved.
 
 OpenABE is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -268,4 +268,3 @@ OpenABE is distributed in the hope that it will be useful, but WITHOUT ANY WARRA
 
 You can be released from the requirements of the GNU Affero General Public License and obtain additional features by purchasing a commercial license. Buying such a license is mandatory if you engage in commercial activities involving OpenABE that do not comply with the open source requirements of the GNU Affero General Public License. 
 
-For more information on licensing, visit <http://www.zeutro.com>.
