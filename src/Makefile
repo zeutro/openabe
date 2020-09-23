@@ -3,7 +3,7 @@ include ../Makefile.common
 
 .PHONY: all clean header
 
-CC = gcc
+CC ?= gcc
 
 OABE_INCLUDE_DIR := $(INCLUDE_ROOT)/openabe
 CXX11FLAGS += $(CXXFLAGS)
