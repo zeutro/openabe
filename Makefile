@@ -59,7 +59,7 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C cli clean
 	$(MAKE) -C examples clean
-	$(RM) -r $(ZROOT)/root
+	$(RM) -rf $(ZROOT)/deps/root
 
 distclean: clean
 	$(MAKE) -C deps clean
