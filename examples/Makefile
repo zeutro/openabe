@@ -2,7 +2,7 @@ include ../Makefile.common
 
 .PHONY: all
 
-CXXFLAGS := $(CXX11FLAGS)$(OS_CXXFLAGS) -pthread -Wall -g -O2 -DSSL_LIB_INIT -I${ZROOT}/deps/root/include -I${ZROOT}/root/include
+CXXFLAGS := $(CXX11FLAGS) $(OS_CXXFLAGS) -pthread -Wall -g -O2 -DSSL_LIB_INIT -I${ZROOT}/deps/root/include -I${ZROOT}/root/include
 LDFLAGS := -L${ZROOT}/deps/root/lib -L${ZROOT}/root/lib
 LIBS := -lcrypto -lrelic -lrelic_ec -lopenabe
 
