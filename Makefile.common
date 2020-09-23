@@ -1,7 +1,7 @@
 # Shared Makefile for 
 
-CC = g++
-CXX = g++
+CC ?= g++
+CXX ?= g++
 ifndef LDLIBS
 LDLIBS := -lgtest -lpthread
 endif
