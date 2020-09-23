@@ -9,8 +9,12 @@ endif
 DEPS_INSTALL_ZROOT = $(ZROOT)/deps/root
 OABE_LIB_ROOT = $(ZROOT)/root/lib
 INCLUDE_ROOT = $(ZROOT)/root/include
+ifndef LOCAL_LIB_ROOT
 LOCAL_LIB_ROOT = /usr/local/lib
+endif
+ifndef LOCAL_INCLUDE
 LOCAL_INCLUDE = /usr/local/include
+endif
 LOCAL_INSTALL_BIN = /usr/local/bin
 
 # Include locations
@@ -42,7 +46,8 @@ else
 endif
 
 # Set shared lib extension for each OS
-DEPS_PACKAGES = relic openssl gtest
+DEPS_PACKAGES = $(if $(USE_DEPS),$(USE_DEPS),"relic openssl gtest")
+$(info DEPS_PACKAGES: $(DEPS_PACKAGES) *** )
 ADD_CFLAGS :=
 OS_CXXFLAGS :=
 WITH_BP := 

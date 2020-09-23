@@ -8,6 +8,7 @@ CC ?= gcc
 OABE_INCLUDE_DIR := $(INCLUDE_ROOT)/openabe
 CXX11FLAGS += $(CXXFLAGS)
 
+$(info CXX11FLAGS: $(CXX11FLAGS) )
 RELICLIBS = -lrelic_s 
 #$(DEPS_INSTALL_ROOT)/lib/librelic_s.a
 
