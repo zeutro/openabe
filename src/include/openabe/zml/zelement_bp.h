@@ -273,4 +273,4 @@ typedef OpenABEElementList::iterator OpenABEElementListIterator;
 void multi_bp_map_op(const bp_group_t group, oabe::GT& gt,
                      std::vector<oabe::G1>& g1, std::vector<oabe::G2>& g2);
 
-#endif	// __ZELEMENT_H__
+#endif	// __ZELEMENT_BP_H__

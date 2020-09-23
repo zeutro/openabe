@@ -29,10 +29,11 @@ bindings:
 	$(MAKE) -C bindings
 
 install-deps:
+	mkdir -p $(ZROOT)/deps/root/bin
 	mkdir -p $(INSTALL_PREFIX)
 	cp -r $(ZROOT)/deps/root/lib $(INSTALL_PREFIX)
 	cp -r $(ZROOT)/deps/root/include $(INSTALL_PREFIX)
-	cp -r $(ZROOT)/deps/root/bin $(INSTALL_PREFIX)
+	cp -rn $(ZROOT)/deps/root/bin $(INSTALL_PREFIX)
 
 install: install-deps
 	mkdir -p $(INSTALL_PREFIX)/bin
@@ -58,7 +59,7 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C cli clean
 	$(MAKE) -C examples clean
-	$(RM) -r $(ZROOT)/root
+	$(RM) -rf $(ZROOT)/deps/root
 
 distclean: clean
 	$(MAKE) -C deps clean
