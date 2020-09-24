@@ -9,7 +9,7 @@ OABE_LIB = $(OABE_LIB_ROOT)/$(OABELIB)
 all: $(BINOBJS)
 
 clean:
-	-rm -rf *.o $(TESTOBJS) $(BINOBJS) $(OABELIB)
+	-rm -rf *.o *.dSYM input.txt $(TESTOBJS) $(BINOBJS) $(OABELIB)
 
 install: $(BINOBJS)
 	for b in $(BINOBJS); do \

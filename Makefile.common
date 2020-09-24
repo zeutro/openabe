@@ -19,13 +19,13 @@ LOCAL_INSTALL_BIN = /usr/local/bin
 
 # Include locations
 #  Dependencies (C/C++)
-CCFLAGS := -I$(DEPS_INSTALL_ZROOT)/include
+CCFLAGS = -I$(DEPS_INSTALL_ZROOT)/include
 CXXFLAGS := -I$(DEPS_INSTALL_ZROOT)/include
 #  Local includes (for generated headers from bison/flex)
 CXXFLAGS += -I$(ZROOT)/src
 #  Common includes (C/C++)
-CCFLAGS += -I$(INCLUDE_ROOT)
-CXXFLAGS += -I$(INCLUDE_ROOT)
+CCFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
+CXXFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
 
 RELIC_LIB = -lrelic -lrelic_ec
 GMP_LIB = -lgmp
@@ -61,7 +61,6 @@ ifeq ($(OS), Windows_NT)
     CMAKE_VARS := -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe CMAKE_INCLUDE_PATH="/usr/local/include" CMAKE_LIBRARY_PATH="/usr/local/lib"
     SHLIB := dll
     GTESTEXT := $(SHLIB)
-    CCFLAGS += -I$(LOCAL_INCLUDE)
     # No need to set -fPIC for windows as all code is position independent by default.
     CXXFLAGS += -DGTEST_USE_OWN_TR1_TUPLE=0 -I/usr/local/include/ -I/usr/include
     SHFLAGS := -nostartfiles
@@ -97,7 +96,8 @@ else
        SHLIB = dylib
        GTESTEXT = 0.$(SHLIB)
        # pull in headers installed via brew (for gmp/relic/openssl)
-       CXXFLAGS += -I$(LOCAL_INCLUDE)
+       CCFLAGS += -fPIC
+       CXXFLAGS += -I$(LOCAL_INCLUDE) $(OS_CXXFLAGS)
        # include the clang C++ standard library (as a result, enable TR1_TUPLE flag)
        CXXFLAGS += -stdlib=libc++ -DGTEST_USE_OWN_TR1_TUPLE=1 -Wno-deprecated
        # (Option to use GMP with OpenSSL?): -DOPENSSL_USE_GMP -lgmp
