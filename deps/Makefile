@@ -18,3 +18,9 @@ clean: $(DIRS)
 	for d in relic openssl gtest; do \
 		make -C $$d clean; \
 	done
+
+distclean: $(DIRS)
+	rm -rf root
+	for d in relic openssl gtest; do \
+		make -C $$d distclean; \
+	done

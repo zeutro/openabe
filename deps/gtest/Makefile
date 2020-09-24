@@ -24,3 +24,6 @@ googletest-release-$(VERSION): googletest-release-$(VERSION).zip
 
 clean:
 	rm -rf googletest-release-$(VERSION)
+
+distclean:
+	rm -rf googletest-release-$(VERSION)*
