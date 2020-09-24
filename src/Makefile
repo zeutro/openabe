@@ -132,7 +132,7 @@ test_zsym: $(ZSYMLIB)
 	$(CXX) -o test_zsym $(CXX11FLAGS) $(LDFLAGS) -L. test_zsym.cpp $(ZSYMLIB) $(ZSYM_DEP_LIBS)
 
 clean:
-	-rm -rf *.o a.out $(PROGRAMS) $(OABELIB) $(OABE_SHLIB) $(ZSYMLIB) $(GENFILES)
+	-rm -rf *.o *.dSYM a.out zparser.output $(PROGRAMS) $(OABELIB) $(OABE_SHLIB) $(ZSYMLIB) $(GENFILES)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $<
