@@ -19,7 +19,7 @@ clean: $(DIRS)
 		make -C $$d clean; \
 	done
 
-distclean: $(DIRS)
+distclean: clean
 	rm -rf root
 	for d in relic openssl gtest; do \
 		make -C $$d distclean; \

@@ -61,5 +61,5 @@ clean:
 	$(MAKE) -C examples clean
 	$(RM) -rf $(ZROOT)/deps/root
 
-distclean: clean
-	$(MAKE) -C deps clean
+distclean:	clean
+	$(MAKE) -C deps distclean
