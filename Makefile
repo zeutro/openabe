@@ -60,6 +60,7 @@ clean:
 	$(MAKE) -C cli clean
 	$(MAKE) -C examples clean
 	$(RM) -rf $(ZROOT)/deps/root
+	$(RM) -rf $(ZROOT)/root/lib/* $(ZROOT)/root/include/*
 
 distclean:	clean
 	$(MAKE) -C deps distclean
