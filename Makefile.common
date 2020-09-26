@@ -2,9 +2,8 @@
 
 CC ?= g++
 CXX ?= g++
-ifndef LDLIBS
-LDLIBS := -lgtest -lpthread
-endif
+
+LDLIBS ?= -lgtest -lpthread
 
 DEPS_INSTALL_ZROOT = $(ZROOT)/deps/root
 OABE_LIB_ROOT = $(ZROOT)/root/lib
