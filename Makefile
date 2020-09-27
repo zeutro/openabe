@@ -7,7 +7,7 @@ ifndef ZROOT
     $(error ZROOT is undefined. Need to source env file: . ./env)
 endif
 
-INSTALL_PREFIX := /usr/local
+INSTALL_PREFIX = /usr/local
 
 docs:
 	$(MAKE) -C docs
