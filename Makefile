@@ -7,7 +7,7 @@ ifndef ZROOT
     $(error ZROOT is undefined. Need to source env file: . ./env)
 endif
 
-INSTALL_PREFIX := /usr/local
+INSTALL_PREFIX = /usr/local
 
 docs:
 	$(MAKE) -C docs
@@ -60,6 +60,7 @@ clean:
 	$(MAKE) -C cli clean
 	$(MAKE) -C examples clean
 	$(RM) -rf $(ZROOT)/deps/root
+	$(RM) -rf $(ZROOT)/root/lib/* $(ZROOT)/root/include/*
 
 distclean:	clean
 	$(MAKE) -C deps distclean

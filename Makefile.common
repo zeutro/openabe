@@ -1,21 +1,16 @@
-# Shared Makefile for 
+# Shared Makefile for openabe build from the source
 
 CC ?= g++
 CXX ?= g++
-ifndef LDLIBS
-LDLIBS := -lgtest -lpthread
-endif
+
+LDLIBS ?= -lgtest -lpthread
 
 DEPS_INSTALL_ZROOT = $(ZROOT)/deps/root
 OABE_LIB_ROOT = $(ZROOT)/root/lib
 INCLUDE_ROOT = $(ZROOT)/root/include
-ifndef LOCAL_LIB_ROOT
-LOCAL_LIB_ROOT = /usr/local/lib
-endif
-ifndef LOCAL_INCLUDE
-LOCAL_INCLUDE = /usr/local/include
-endif
-LOCAL_INSTALL_BIN = /usr/local/bin
+LOCAL_LIB_ROOT ?= /usr/local/lib
+LOCAL_INCLUDE ?= /usr/local/include
+LOCAL_INSTALL_BIN ?= /usr/local/bin
 
 # Include locations
 #  Dependencies (C/C++)
@@ -28,6 +23,7 @@ CCFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
 CXXFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
 
 RELIC_LIB = -lrelic -lrelic_ec
+RELIC_LIB_STATIC = -lrelic_s -lrelic_s_ec
 GMP_LIB = -lgmp
 SSL_LIB = -lssl
 CRYPTO_LIB = -lcrypto
@@ -141,12 +137,12 @@ else
   # relic-only build for math ops
   CXXFLAGS += $(OPENSSL_ZML)
   CCFLAGS += -g -O2 $(OPENSSL_ZML) $(ADD_CFLAGS) 
-  OABELDLIBS = $(RELIC_LIB)
+  OABELDLIBS = $(RELIC_LIB_STATIC)
   OABELDSHLIBS = $(RELIC_LIB)
 endif
 # remaining deps
-OABELDLIBS += $(SSL_LIB) $(CRYPTO_LIB)
-OABELDSHLIBS += $(SSL_LIB) $(CRYPTO_LIB)
+OABELDLIBS += $(SSL_LIB) $(CRYPTO_LIB) $(GMP_LIB)
+OABELDSHLIBS += $(SSL_LIB) $(CRYPTO_LIB) $(GMP_LIB)
 
 SHLIB_PATH = $(LDFLAGS)
 
