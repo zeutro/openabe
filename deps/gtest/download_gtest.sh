@@ -10,5 +10,5 @@ GTEST_VERSION=googletest-release-${VERSION}.zip
 GTEST_LINK=https://github.com/google/googletest/archive/release-${VERSION}.zip
 
 if [[ ! -f ${GTEST_VERSION} ]]; then
-    wget -O ${GTEST_VERSION} ${GTEST_LINK}
+    wget -O ${GTEST_VERSION} ${GTEST_LINK}  --no-check-certificate
 fi
