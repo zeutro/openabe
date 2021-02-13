@@ -38,9 +38,6 @@
 /* namespace to enclose parser in */
 %name-prefix "oabe"
 
-/* set the parser's class identifier */
-%define api.parser.class {Parser}
-
 /* keep track of the current position within the input */
 %locations
 %initial-action

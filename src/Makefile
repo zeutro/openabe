@@ -41,6 +41,12 @@ ifeq ($(ENABLE_GCOV), yes)
   SHFLAGS += $(COVERAGE_LINKER)
 endif
 
+ifeq ($(OS_FAMILY), redhat)
+    BISON_PARSER_DEF="parser_class_name=Parser"
+else
+    BISON_PARSER_DEF="api.parser.class=Parser"
+endif
+
 ZSYM_OBJS = zobject.o zerror.o zprng.o zsymcrypto.o
 
 LIBRARYH=header
@@ -55,7 +61,7 @@ zml/zelement.o:
 	$(CC) $(CCFLAGS) -c zml/zelement.c -o zelement.o
 
 zparser.o: zparser.yy
-	$(BISON) -d -v zparser.yy
+	$(BISON) -d -D $(BISON_PARSER_DEF) -v zparser.yy
 	cp *.hh $(OABE_INCLUDE_DIR)
 	$(CXX) $(CXXFLAGS) -c -o zparser.o zparser.tab.cc
 
