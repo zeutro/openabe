@@ -15,12 +15,14 @@ endif
 
 clean: $(DIRS)
 	rm -rf root
-	for d in relic openssl gtest; do \
+	for d in relic openssl; do \
+	# for d in relic openssl gtest; do \
 		make -C $$d clean; \
 	done
 
 distclean: clean
 	rm -rf root
-	for d in relic openssl gtest; do \
+	for d in relic openssl; do \
+	# for d in relic openssl gtest; do \
 		make -C $$d distclean; \
 	done
