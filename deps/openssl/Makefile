@@ -18,7 +18,7 @@ openssl-${VERSION}/.built: openssl-${VERSION}
 	touch .built
 
 package:
-	./download_openssl.sh ${WITH_BP}
+	./download_openssl.sh
 
 openssl-${VERSION}: openssl-${VERSION}.tar.gz
 	tar -zxf $^

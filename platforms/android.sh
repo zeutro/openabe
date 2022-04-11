@@ -24,7 +24,7 @@
 #!/bin/bash
 
 # Specify software versions as globals in this script.
-OPENSSL="openssl-1.1.1-dev"
+OPENSSL="openssl-1.1.1-stable"
 RELIC="relic-toolkit-0.4.1h"
 GTEST="googletest-release-1.8.0"
 GMP="gmp-6.0.0a"
