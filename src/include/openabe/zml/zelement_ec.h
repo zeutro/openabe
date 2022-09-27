@@ -150,13 +150,13 @@ public:
   friend G_t operator*(const G_t&, const G_t&);
   friend std::ostream& operator<<(std::ostream&, const G_t&);
   friend bool operator==(const G_t& x,const G_t& y) {
-    if(ec_point_cmp(GET_GROUP(x.ecgroup), x.m_G, y.m_G) == G_CMP_EQ)
+    if(ec_point_cmp(GET_GROUP(x.ecgroup), x.m_G, y.m_G) == G_RLC_EQ)
       return true;
     else
       return false;
   }
   friend bool operator!=(const G_t& x,const G_t& y) {
-    if (ec_point_cmp(GET_GROUP(y.ecgroup), x.m_G, y.m_G) != G_CMP_EQ)
+    if (ec_point_cmp(GET_GROUP(y.ecgroup), x.m_G, y.m_G) != G_RLC_EQ)
       return true;
     else return false;
   }

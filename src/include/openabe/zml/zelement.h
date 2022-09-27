@@ -80,7 +80,7 @@ typedef BIGNUM* bignum_t;
 #define BN_CMP_LT       -1
 #define BN_CMP_EQ        0
 #define BN_CMP_GT        1
-#define G_CMP_EQ         BN_CMP_EQ
+#define G_RLC_EQ         BN_CMP_EQ
 
 /* END OpenSSL macro definitions */
 
@@ -102,13 +102,13 @@ typedef bn_t bignum_t;
 #define zml_bignum_is_zero(b)             bn_is_zero(b)
 #define zml_bignum_is_one(b)              bn_is_one(b)
 
-#define BN_CMP_LT                     CMP_LT
-#define BN_CMP_EQ                     CMP_EQ
-#define BN_CMP_GT                     CMP_GT
+#define BN_CMP_LT                     RLC_LT
+#define BN_CMP_EQ                     RLC_EQ
+#define BN_CMP_GT                     RLC_GT
 
-#define BN_POSITIVE                   BN_POS
-#define BN_NEGATIVE                   BN_NEG
-#define G_CMP_EQ                      CMP_EQ
+#define BN_POSITIVE                   RLC_POS
+#define BN_NEGATIVE                   RLC_NEG
+#define G_RLC_EQ                      RLC_EQ
 
 int bn_is_one(const bn_t a);
 /* END of RELIC macro definitions */
@@ -252,16 +252,16 @@ typedef GT_ELEM* gt_ptr;
         fp12_null(g); \
         fp12_new(g);
 
-#define g1_copy_const    CAT(G1_LOWER, copy_const)
-#define g2_copy_const    CAT(G2_LOWER, copy_const)
-#define gt_copy_const    CAT(GT_LOWER, copy_const)
-#define g1_set_rand      CAT(G1_LOWER, set_rand)
-#define g2_set_rand      CAT(G2_LOWER, set_rand)
-#define gt_set_rand      CAT(GT_LOWER, set_rand)
-#define g1_write_ostream CAT(G1_LOWER, write_ostream)
-#define g2_write_ostream CAT(G2_LOWER, write_ostream)
-#define gt_write_ostream CAT(GT_LOWER, write_ostream)
-#define gt_is_zero       CAT(GT_LOWER, is_zero)
+#define g1_copy_const    RLC_CAT(RLC_G1_LOWER, copy_const)
+#define g2_copy_const    RLC_CAT(RLC_G2_LOWER, copy_const)
+#define gt_copy_const    RLC_CAT(RLC_GT_LOWER, copy_const)
+#define g1_set_rand      RLC_CAT(RLC_G1_LOWER, set_rand)
+#define g2_set_rand      RLC_CAT(RLC_G2_LOWER, set_rand)
+#define gt_set_rand      RLC_CAT(RLC_GT_LOWER, set_rand)
+#define g1_write_ostream RLC_CAT(RLC_G1_LOWER, write_ostream)
+#define g2_write_ostream RLC_CAT(RLC_G2_LOWER, write_ostream)
+#define gt_write_ostream RLC_CAT(RLC_GT_LOWER, write_ostream)
+#define gt_is_zero       RLC_CAT(RLC_GT_LOWER, is_zero)
 
 void bn_copy_const(bn_t c, const bn_t a);
 void ep_copy_const(ep_t r, const ep_t p);

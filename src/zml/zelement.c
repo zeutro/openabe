@@ -42,7 +42,7 @@ void zml_clean() {
 int zml_check_error() {
   ctx_t *ctx = core_get();
   if (ctx != NULL) {
-    if (ctx->code == STS_OK)
+    if (ctx->code == RLC_OK)
       return TRUE;
     else
       return FALSE; /* means there was an error */
@@ -103,7 +103,7 @@ int zml_bignum_countbytes(const bignum_t a) {
 
 #if !defined(BN_WITH_OPENSSL)
 void zml_bignum_rand(bignum_t a, bignum_t o) {
-  bn_rand(a, BN_POS, bn_bits(o));
+  bn_rand(a, RLC_POS, bn_bits(o));
 }
 #endif
 
@@ -149,7 +149,7 @@ void zml_bignum_sub_order(bignum_t r, const bignum_t x, const bignum_t y,
   BN_CTX_free(ctx);
 #else
   bn_sub(r, x, y);
-  if (bn_sign(r) == BN_NEG) {
+  if (bn_sign(r) == RLC_NEG) {
     bn_add(r, r, o);
   } else {
     bn_mod(r, r, o);
@@ -166,7 +166,7 @@ void zml_bignum_mul(bignum_t r, const bignum_t x, const bignum_t y,
   BN_CTX_free(ctx);
 #else
   bn_mul(r, x, y);
-  if (bn_sign(r) == BN_NEG) {
+  if (bn_sign(r) == RLC_NEG) {
     bn_add(r, r, o);
   } else {
     bn_mod(r, r, o);
@@ -260,7 +260,7 @@ void zml_bignum_negate(bignum_t b, const bignum_t o) {
   }
 #else
   bn_neg(b, b);
-  if (bn_sign(b) == BN_NEG) {
+  if (bn_sign(b) == RLC_NEG) {
     bn_add(b, b, o);
   }
 #endif
@@ -278,7 +278,7 @@ int zml_bignum_mod_inv(bignum_t a, const bignum_t b, const bignum_t o) {
   // computes (1 / b) mod o
   bn_gcd_ext(s, a, NULL, b, o);
   // check if negative
-  if (bn_sign(a) == BN_NEG) {
+  if (bn_sign(a) == RLC_NEG) {
     bn_add(a, a, o);
   }
   bn_free(s);
@@ -368,7 +368,7 @@ int ec_point_is_on_curve(ec_group_t group, ec_point_t p) {
   int ret = EC_POINT_is_on_curve(group, p, NULL);
   return ret;
 #else
-  if (ec_ep_is_valid(p))
+  if (ep_on_curve(p))
     return 1;
 #endif
   return 0;
@@ -455,7 +455,7 @@ int ec_convert_to_point(ec_group_t group, ec_point_t p, uint8_t *xstr,
 int bp_group_init(bp_group_t *group, uint8_t id) {
 #if !defined(BP_WITH_OPENSSL)
   /* RELIC definitions */
-  int twist = EP_DTYPE; // , degree = 2;
+  int twist = RLC_EP_DTYPE; // , degree = 2;
 #endif
   switch (id) {
 #if defined(BP_WITH_OPENSSL)
@@ -538,7 +538,7 @@ void g1_sub_op(bp_group_t group, g1_ptr z, const g1_ptr x) {
       G1_ELEM_add(group, z, x, z, NULL);
   }
 #else
-  ep_sub_projc(z, x, z);
+  ep_sub(z, x, z);
   ep_norm(z, z);
 #endif
 
@@ -767,12 +767,12 @@ void ep_copy_const(ep_t r, const ep_t p) {
     fp_copy_const(r->x, p->x);
     fp_copy_const(r->y, p->y);
     fp_copy_const(r->z, p->z);
-    r->norm = p->norm;
+    r->coord = p->coord;
 }
 
 void fp_copy_const(fp_t c, const fp_t a) {
     int i;
-    for (i = 0; i < FP_DIGS; i++) {
+    for (i = 0; i < RLC_FP_DIGS; i++) {
             c[i] = a[i];
     }
 }
@@ -781,7 +781,7 @@ void ep2_copy_const(ep2_t r, const ep2_t p) {
     fp2_copy_const(r->x, p->x);
     fp2_copy_const(r->y, p->y);
     fp2_copy_const(r->z, p->z);
-    r->norm = p->norm;
+    r->coord = p->coord;
 }
 
 void fp2_copy_const(fp2_t c, const fp2_t a) {
@@ -801,14 +801,14 @@ void fp6_copy_const(fp6_t c, const fp6_t a) {
 }
 
 int bn_cmp_const(bn_t a, const bn_t b) {
-    if (a->sign == BN_POS && b->sign == BN_NEG) {
-        return CMP_GT;
+    if (a->sign == RLC_POS && b->sign == RLC_NEG) {
+        return RLC_GT;
     }
-    if (a->sign == BN_NEG && b->sign == BN_POS) {
-        return CMP_LT;
+    if (a->sign == RLC_NEG && b->sign == RLC_POS) {
+        return RLC_LT;
     }
 
-    if (a->sign == BN_NEG) {
+    if (a->sign == RLC_NEG) {
         return bn_cmp_abs_const(b, a);
     }
 
@@ -817,11 +817,11 @@ int bn_cmp_const(bn_t a, const bn_t b) {
 
 int bn_cmp_abs_const(const bn_t a, const bn_t b) {
     if (a->used > b->used) {
-        return CMP_GT;
+        return RLC_GT;
     }
 
     if (a->used < b->used) {
-        return CMP_LT;
+        return RLC_LT;
     }
 
     return bn_cmpn_low_const(a->dp, b->dp, a->used);
@@ -833,10 +833,10 @@ int bn_cmpn_low_const(const dig_t *a, const dig_t *b, const int size) {
     a += (size - 1);
     b += (size - 1);
 
-    r = CMP_EQ;
+    r = RLC_EQ;
     for (i = 0; i < size; i++, --a, --b) {
-        if (*a != *b && r == CMP_EQ) {
-            r = (*a > *b ? CMP_GT : CMP_LT);
+        if (*a != *b && r == RLC_EQ) {
+            r = (*a > *b ? RLC_GT : RLC_LT);
         }
     }
     return r;
@@ -844,50 +844,50 @@ int bn_cmpn_low_const(const dig_t *a, const dig_t *b, const int size) {
 
 
 int ep_cmp_const(ep_t p, const ep_t q) {
-    if (fp_cmp_const(p->x, q->x) != CMP_EQ) {
-        return CMP_NE;
+    if (fp_cmp_const(p->x, q->x) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    if (fp_cmp_const(p->y, q->y) != CMP_EQ) {
-        return CMP_NE;
+    if (fp_cmp_const(p->y, q->y) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    if (fp_cmp_const(p->z, q->z) != CMP_EQ) {
-        return CMP_NE;
+    if (fp_cmp_const(p->z, q->z) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    return CMP_EQ;
+    return RLC_EQ;
 }
 
 int ep2_cmp_const(ep2_t p, const ep2_t q) {
-    if (fp2_cmp_const(p->x, q->x) != CMP_EQ) {
-        return CMP_NE;
+    if (fp2_cmp_const(p->x, q->x) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    if (fp2_cmp_const(p->y, q->y) != CMP_EQ) {
-        return CMP_NE;
+    if (fp2_cmp_const(p->y, q->y) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    if (fp2_cmp_const(p->z, q->z) != CMP_EQ) {
-        return CMP_NE;
+    if (fp2_cmp_const(p->z, q->z) != RLC_EQ) {
+        return RLC_NE;
     }
 
-    return CMP_EQ;
+    return RLC_EQ;
 }
 
 int fp12_cmp_const(fp12_t a, const fp12_t b) {
-    return ((fp6_cmp_const(a[0], b[0]) == CMP_EQ) &&
-            (fp6_cmp_const(a[1], b[1]) == CMP_EQ) ? CMP_EQ : CMP_NE);
+    return ((fp6_cmp_const(a[0], b[0]) == RLC_EQ) &&
+            (fp6_cmp_const(a[1], b[1]) == RLC_EQ) ? RLC_EQ : RLC_NE);
 }
 
 int fp6_cmp_const(fp6_t a, const fp6_t b) {
-    return ((fp2_cmp_const(a[0], b[0]) == CMP_EQ) && (fp2_cmp_const(a[1], b[1]) == CMP_EQ)
-            && (fp2_cmp_const(a[2], b[2]) == CMP_EQ) ? CMP_EQ : CMP_NE);
+    return ((fp2_cmp_const(a[0], b[0]) == RLC_EQ) && (fp2_cmp_const(a[1], b[1]) == RLC_EQ)
+            && (fp2_cmp_const(a[2], b[2]) == RLC_EQ) ? RLC_EQ : RLC_NE);
 }
 
 int fp2_cmp_const(fp2_t a, const fp2_t b) {
-    return (fp_cmp_const(a[0], b[0]) == CMP_EQ) &&
-    (fp_cmp_const(a[1], b[1]) == CMP_EQ) ? CMP_EQ : CMP_NE;
+    return (fp_cmp_const(a[0], b[0]) == RLC_EQ) &&
+    (fp_cmp_const(a[1], b[1]) == RLC_EQ) ? RLC_EQ : RLC_NE;
 }
 
 int fp_cmp_const(fp_t a, const fp_t b) {
@@ -897,13 +897,13 @@ int fp_cmp_const(fp_t a, const fp_t b) {
 int fp_cmpn_low_const(dig_t *a, const dig_t *b) {
     int i, r;
 
-    a += (FP_DIGS - 1);
-    b += (FP_DIGS - 1);
+    a += (RLC_FP_DIGS - 1);
+    b += (RLC_FP_DIGS - 1);
 
-    r = CMP_EQ;
-    for (i = 0; i < FP_DIGS; i++, --a, --b) {
-        if (*a != *b && r == CMP_EQ) {
-            r = (*a > *b ? CMP_GT : CMP_LT);
+    r = RLC_EQ;
+    for (i = 0; i < RLC_FP_DIGS; i++, --a, --b) {
+        if (*a != *b && r == RLC_EQ) {
+            r = (*a > *b ? RLC_GT : RLC_LT);
         }
     }
     return r;

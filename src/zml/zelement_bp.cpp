@@ -460,7 +460,7 @@ ZP power(const ZP &x, const ZP &r) {
 bool ZP::ismember(void) {
   ASSERT(isInit && isOrderSet, OpenABE_ERROR_ELEMENT_NOT_INITIALIZED);
   bool result;
-  // CMP_LT if a < b, CMP_EQ if a == b and CMP_GT if a > b.
+  // RLC_LT if a < b, RLC_EQ if a == b and RLC_GT if a > b.
   result = (zml_bignum_cmp(m_ZP, order) == BN_CMP_LT &&
             zml_bignum_sign(m_ZP) == BN_POSITIVE);
   return result;
@@ -791,9 +791,9 @@ bool operator==(const G1 &x, const G1 &y) {
   bool result;
 #if defined(BP_WITH_OPENSSL)
   result =
-      (G1_ELEM_cmp(GET_BP_GROUP(x.bgroup), x.m_G1, y.m_G1, NULL) == G_CMP_EQ);
+      (G1_ELEM_cmp(GET_BP_GROUP(x.bgroup), x.m_G1, y.m_G1, NULL) == G_RLC_EQ);
 #else
-  result = (g1_cmp(x.m_G1, y.m_G1) == CMP_EQ);
+  result = (g1_cmp(x.m_G1, y.m_G1) == RLC_EQ);
 #endif
   return result;
 }
@@ -802,9 +802,9 @@ bool operator!=(const G1 &x, const G1 &y) {
   bool result;
 #if defined(BP_WITH_OPENSSL)
   result =
-      (G1_ELEM_cmp(GET_BP_GROUP(x.bgroup), x.m_G1, y.m_G1, NULL) != G_CMP_EQ);
+      (G1_ELEM_cmp(GET_BP_GROUP(x.bgroup), x.m_G1, y.m_G1, NULL) != G_RLC_EQ);
 #else
-  result = (g1_cmp(x.m_G1, y.m_G1) != CMP_EQ);
+  result = (g1_cmp(x.m_G1, y.m_G1) != RLC_EQ);
 #endif
   return result;
 }
@@ -1002,12 +1002,12 @@ ostream& operator<<(ostream& os, const G2& g2)
 
 bool operator==(const G2& x,const G2& y)
 {
-    return (g2_cmp_op(GET_BP_GROUP(x.bgroup), const_cast<G2&>(x).m_G2, const_cast<G2&>(y).m_G2) == G_CMP_EQ);
+    return (g2_cmp_op(GET_BP_GROUP(x.bgroup), const_cast<G2&>(x).m_G2, const_cast<G2&>(y).m_G2) == G_RLC_EQ);
 }
 
 bool operator!=(const G2& x,const G2& y)
 {
-    return (g2_cmp_op(GET_BP_GROUP(x.bgroup), const_cast<G2&>(x).m_G2, const_cast<G2&>(y).m_G2) != G_CMP_EQ);
+    return (g2_cmp_op(GET_BP_GROUP(x.bgroup), const_cast<G2&>(x).m_G2, const_cast<G2&>(y).m_G2) != G_RLC_EQ);
 }
 
 void
@@ -1198,9 +1198,9 @@ bool operator==(const GT& x,const GT& y)
 {
     bool result;
 #if defined(BP_WITH_OPENSSL)
-    result = (GT_ELEM_cmp(x.m_GT, y.m_GT) == G_CMP_EQ);
+    result = (GT_ELEM_cmp(x.m_GT, y.m_GT) == G_RLC_EQ);
 #else
-    result = (gt_cmp(const_cast<GT&>(x).m_GT, const_cast<GT&>(y).m_GT) == G_CMP_EQ);
+    result = (gt_cmp(const_cast<GT&>(x).m_GT, const_cast<GT&>(y).m_GT) == G_RLC_EQ);
 #endif
     return result;
 }
@@ -1209,9 +1209,9 @@ bool operator!=(const GT& x, const GT& y)
 {
     bool result;
 #if defined(BP_WITH_OPENSSL)
-    result = (GT_ELEM_cmp(x.m_GT, y.m_GT) != G_CMP_EQ);
+    result = (GT_ELEM_cmp(x.m_GT, y.m_GT) != G_RLC_EQ);
 #else
-    result = (gt_cmp(const_cast<GT&>(x).m_GT, const_cast<GT&>(y).m_GT) != G_CMP_EQ);
+    result = (gt_cmp(const_cast<GT&>(x).m_GT, const_cast<GT&>(y).m_GT) != G_RLC_EQ);
 #endif
     return result;
 }

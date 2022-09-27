@@ -1,13 +1,13 @@
 #!/bin/bash
 
-VERSION=0.5.0
+VERSION=0.6.0
 FORMAT=tar.gz
 LINK=https://github.com/relic-toolkit/relic
 RELIC=${1:-relic-toolkit-${VERSION}}
 
-# commit of as of 1/9/2019
+# commit of as of 22/07/2022
 # comment 'Update LABEL with recent changes'
-COMMIT=b984e901ba78c83ea4093ea96addd13628c8c2d0
+COMMIT=40f24f017d461647ce6202c3ccaae3c22037369c
 
 # This below is the latest commmit before "Massive renaming of symbols to include prefix RLC.",
 # a commit that changes a lot of symbols and stuff (so do not use commits after that, unless you
