@@ -2,10 +2,14 @@
 
 include ../../Makefile.common
 
+<<<<<<< HEAD
 
 VERSION=toolkit-0.6.0
 
 
+=======
+VERSION=toolkit-0.5.0
+>>>>>>> parent of 1fc3af2... Updated OpenSSL dependency and build scripts
 BP_LABEL=bp
 BP_TMP=$(shell mktemp -d tmp$(BP_LABEL)-XXXX)
 BP_HDR_PREFIX=_$(BP_LABEL)

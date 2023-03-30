@@ -2,18 +2,25 @@
 
 CMD=$1
 FORMAT=tar.gz
-# commit as of 04/04/2022
-COMMIT=3e8f70c30d84861fcd257a6e280dc49e104eb145
+# commit as of 4/13/2018
+# comment 'make update'
+COMMIT=560096f804a3712eea161726a8f085beefe8838a
 
-
-LINK=https://github.com/openssl/openssl
-VERSION=1.1.1-stable
-STABLEBRANCH=OpenSSL_1_1_1-stable
-echo "Clone github repo @ ${LINK}"
-git clone -b ${STABLEBRANCH} ${LINK} openssl-${VERSION}.git
-cd openssl-${VERSION}.git
-git reset --hard ${COMMIT}
-
+# openssl with BP support
+if [[ $CMD == "with-bp" ]]; then
+   LINK=https://github.com/zeutro/openssl
+   VERSION=1.1.1-dev-bp
+   echo "Clone github repo @ ${LINK}"
+   git clone -b patch ${LINK} openssl-${VERSION}.git
+   cd openssl-${VERSION}.git
+else
+   LINK=https://github.com/openssl/openssl
+   VERSION=1.1.1-dev
+   echo "Clone github repo @ ${LINK}"
+   git clone ${LINK} openssl-${VERSION}.git
+   cd openssl-${VERSION}.git
+   git reset --hard ${COMMIT}
+fi
 
 OPENSSL=openssl-${VERSION}
 if [[ ! -f ./${OPENSSL}.${FORMAT} ]]; then

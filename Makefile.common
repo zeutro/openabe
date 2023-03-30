@@ -29,7 +29,8 @@ GMP_LIB = -lgmp
 SSL_LIB = -lssl
 CRYPTO_LIB = -lcrypto
 RELIC_G =
-OPENSSL_VERSION := 1.1.1-stable
+# commit: 1e3f62a3823f7e3db9d403f724fd9d66f5b04cf8 (as of 7/18/17)
+OPENSSL_VERSION := 1.1.1-dev
 
 # Set flags for C++ 11
 OLD_GPP = $(shell g++ --version | grep -q 4.6 && echo 1)
@@ -48,12 +49,14 @@ DEPS_PACKAGES = $(if $(USE_DEPS),$(USE_DEPS),relic openssl)
 
 ADD_CFLAGS :=
 OS_CXXFLAGS :=
+WITH_BP := 
 
 ifeq ($(OS), Windows_NT)
     RELIC_OS := WINDOWS
     # NOTE: relic build still broken for MINGW
     DEPS_PACKAGES = openssl
-    OPENSSL_VERSION := 1.1.1-stable
+    WITH_BP := "with-bp"
+    OPENSSL_VERSION := 1.1.1-dev-bp
     COMPILER_VARS := -G "MinGW Makefiles" -DSEED=WCGR
     CMAKE_VARS := -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe CMAKE_INCLUDE_PATH="/usr/local/include" CMAKE_LIBRARY_PATH="/usr/local/lib"
     SHLIB := dll
