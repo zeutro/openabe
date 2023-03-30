@@ -1,3 +1,7 @@
+## Fork info
+
+This is a fork of [OpenABE](https://github.com/zeutro/openabe/) with updated installation scripts following [this issue](https://github.com/zeutro/openabe/issues/61). The changes in this fork are thanks to [StefanoBerlato](https://github.com/StefanoBerlato/openabe) and [ChantMisaya](https://github.com/ChantMisaya/openabe). 
+
 # OpenABE
 
 OpenABE is a cryptographic library that incorporates a variety of attribute-based encryption (ABE) algorithms, industry standard cryptographic functions and tools, and an intuitive application programming interface (API). OpenABE is intended to allow developers to seamlessly incorporate ABE technology into applications that would benefit from ABE to protect and control access to sensitive data. OpenABE is designed to be easy to use and does not require developers to be encryption experts.
