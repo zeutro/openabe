@@ -8,7 +8,7 @@ CC ?= gcc
 OABE_INCLUDE_DIR := $(INCLUDE_ROOT)/openabe
 CXX11FLAGS += $(CXXFLAGS)
 
-RELICLIBS = -lrelic_s 
+RELICLIBS = -lrelic_s
 #$(DEPS_INSTALL_ROOT)/lib/librelic_s.a
 
 GTESTLIBS  = -lgtest -lpthread
@@ -17,11 +17,11 @@ OABE_SHLIB = libopenabe.$(SHLIB)
 OABE_KEYS = keys/zkdf.o keys/zkey.o keys/zpkey.o keys/zkeystore.o keys/zsymkey.o
 OABE_LOW = ske/zcontextske.o pke/zcontextpke.o pksig/zcontextpksig.o \
           abe/zcontextabe.o abe/zcontextcca.o abe/zcontextcpwaters.o abe/zcontextkpgpsw.o
-OABE_TOOLS = tools/zlsss.o tools/zprng.o 
+OABE_TOOLS = tools/zlsss.o tools/zprng.o
 OABE_ZML = zml/zgroup.o zml/zpairing.o zml/zelliptic.o zml/zelement.o zml/zelement_ec.o zml/zelement_bp.o
 OABE_UTILS = utils/zkeymgr.o utils/zcryptoutils.o utils/zcontainer.o utils/zbenchmark.o utils/zerror.o utils/zcontainer.o \
             utils/zciphertext.o utils/zpolicy.o utils/zattributelist.o utils/zdriver.o utils/zfunctioninput.o
-            
+
 OABE_OBJ_TARGETS = zobject.o openabe.o zcontext.o zcrypto_box.o zsymcrypto.o zparser.o zscanner.o \
                   $(OABE_ZML) $(OABE_KEYS) $(OABE_LOW) $(OABE_TOOLS) $(OABE_UTILS) openssl_init.o $(OS_OBJS)
 
@@ -30,7 +30,7 @@ OABE_OBJ_FILES = zobject.o openabe.o zgroup.o zlsss.o zerror.o zpairing.o zellip
 	     zcontextske.o zcontextpke.o zcontextpksig.o zcontextabe.o zcontextcpwaters.o zcontextkpgpsw.o \
 	     zcontextcca.o zkdf.o zkeymgr.o zcryptoutils.o zcrypto_box.o zbenchmark.o zparser.o zscanner.o zdriver.o zsymcrypto.o \
 	     openssl_init.o $(OS_OBJS)
-	     
+
 ifeq ($(OS),Windows_NT)
     LDFLAGS += -L/mingw64/bin
 endif
@@ -39,6 +39,13 @@ ifeq ($(ENABLE_GCOV), yes)
   CXXFLAGS += $(COVERAGE_CFLAGS)
   LDFLAGS += $(COVERAGE_LINKER)
   SHFLAGS += $(COVERAGE_LINKER)
+endif
+
+bison_version=$(shell $(BISON) --version | head 1 | grep -Eo "([0-9]+\.)+[0-9]+")
+ifeq ( $(shell printf "$bison_version\n3.3\n" | sort -g | head 1), 3.3 )
+    BISON_PARSER_DEF="parser_class_name=Parser"
+else
+    BISON_PARSER_DEF="api.parser.class=Parser"
 endif
 
 ZSYM_OBJS = zobject.o zerror.o zprng.o zsymcrypto.o
@@ -55,7 +62,7 @@ zml/zelement.o:
 	$(CC) $(CCFLAGS) -c zml/zelement.c -o zelement.o
 
 zparser.o: zparser.yy
-	$(BISON) -d -v zparser.yy
+	$(BISON) -d -D $(BISON_PARSER_DEF) -v zparser.yy
 	cp *.hh $(OABE_INCLUDE_DIR)
 	$(CXX) $(CXXFLAGS) -c -o zparser.o zparser.tab.cc
 
@@ -66,8 +73,8 @@ zscanner.o: zscanner.ll
 header:
 	mkdir -p $(OABE_INCLUDE_DIR)
 	cp -r include/openabe/* $(OABE_INCLUDE_DIR)
-	
-# provides PK, ABE, AEAD and crypto tools 
+
+# provides PK, ABE, AEAD and crypto tools
 $(OABELIB): $(LIBRARYH) $(OABE_OBJ_TARGETS)
 	$(AR) rcs $@ $(OABE_OBJ_FILES)
 	$(CXX) $(SHFLAGS) -o $(OABE_SHLIB) $(OABE_OBJ_FILES) $(SHLIB_PATH) $(OABELDSHLIBS)
