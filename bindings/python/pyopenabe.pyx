@@ -122,23 +122,30 @@ cdef class PyABEContext:
         self.thisptr.exportSecretParams(msk)
         return msk
 
-    def importPublicParams(self, keyBlob):
-        cdef string key = to_bytes(keyBlob)
-        return self.thisptr.importPublicParams(key)
+    # The C++ side overloads these on one and two arguments; a previous version defined it twice but Python has no overloading so it just replcaed the first
+    def importPublicParams(self, *args):
+        cdef string auth_id
+        cdef string key
+        if len(args) == 1:
+            key = to_bytes(args[0])
+            return self.thisptr.importPublicParams(key)
+        elif len(args) == 2:
+            auth_id = to_bytes(args[0])
+            key = to_bytes(args[1])
+            return self.thisptr.importPublicParams(auth_id, key)
+        raise TypeError("importPublicParams() takes (keyBlob) or (authID, keyBlob)")
 
-    def importPublicParams(self, authID, keyBlob):
-        cdef string auth_id = to_bytes(authID)
-        cdef string key = to_bytes(keyBlob)
-        return self.thisptr.importPublicParams(auth_id, key)
-
-    def importSecretParams(self, keyBlob):
-        cdef string key = to_bytes(keyBlob)
-        return self.thisptr.importSecretParams(key)
-
-    def importSecretParams(self, authID, keyBlob):
-        cdef string auth_id = to_bytes(authID)
-        cdef string key = to_bytes(keyBlob)
-        return self.thisptr.importSecretParams(auth_id, key)
+    def importSecretParams(self, *args):
+        cdef string auth_id
+        cdef string key
+        if len(args) == 1:
+            key = to_bytes(args[0])
+            return self.thisptr.importSecretParams(key)
+        elif len(args) == 2:
+            auth_id = to_bytes(args[0])
+            key = to_bytes(args[1])
+            return self.thisptr.importSecretParams(auth_id, key)
+        raise TypeError("importSecretParams() takes (keyBlob) or (authID, keyBlob)")
 
     def importUserKey(self, keyID, keyBlob):
         cdef string key_id = to_bytes(keyID)

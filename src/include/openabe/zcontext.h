@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -49,30 +49,40 @@ class OpenABEKeystore;
 
 class OpenABEContext : public ZObject {
 protected:
-  std::unique_ptr<OpenABERNG>           m_RNG_;
-  std::unique_ptr<OpenABEPairing>       m_Pairing_;
+  std::unique_ptr<OpenABERNG> m_RNG_;
+  std::unique_ptr<OpenABEPairing> m_Pairing_;
   std::unique_ptr<OpenABEEllipticCurve> m_EllipticCurve_;
-  std::unique_ptr<OpenABEKeystore>      m_Keystore_;
-  OpenABESecurityLevel                  m_SecurityLevel;
+  std::unique_ptr<OpenABEKeystore> m_Keystore_;
+  OpenABESecurityLevel m_SecurityLevel;
   OpenABE_SCHEME algID;
-    
+
 public:
   // Constructors/destructors
   OpenABEContext();
   virtual ~OpenABEContext();
 
   // Main functions
-  OpenABEKeystore        *getKeystore() { return this->m_Keystore_.get(); }
-  OpenABERNG				*getRNG() 	   { return this->m_RNG_.get(); }
+  OpenABEKeystore* getKeystore() {
+    return this->m_Keystore_.get();
+  }
+  OpenABERNG* getRNG() {
+    return this->m_RNG_.get();
+  }
   // extract higher-level group objects
-  OpenABEPairing 			*getPairing()  { return this->m_Pairing_.get(); }
-  OpenABEEllipticCurve	*getECCurve()  { return this->m_EllipticCurve_.get(); }
+  OpenABEPairing* getPairing() {
+    return this->m_Pairing_.get();
+  }
+  OpenABEEllipticCurve* getECCurve() {
+    return this->m_EllipticCurve_.get();
+  }
 
-  OpenABE_SCHEME           getAlgorithmID() { return this->algID; }
-  virtual OpenABE_ERROR	initializeCurve(const std::string groupParams) = 0;
-  OpenABE_ERROR			loadUserSecretParams(const std::string &skID, const std::string &sk);
+  OpenABE_SCHEME getAlgorithmID() {
+    return this->algID;
+  }
+  virtual OpenABE_ERROR initializeCurve(const std::string groupParams) = 0;
+  OpenABE_ERROR loadUserSecretParams(const std::string& skID, const std::string& sk);
 };
 
-}
+} // namespace oabe
 
-#endif	// __ZCONTEXT_H__
+#endif // __ZCONTEXT_H__

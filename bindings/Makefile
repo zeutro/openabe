@@ -2,19 +2,19 @@ include ../Makefile.common
 
 .PHONY: all test clean
 
-DIRS=python
+DIRS = python
 
 all: $(DIRS)
 	for d in $(DIRS); do \
-	    make -C $$d; \
+		make -C $$d; \
 	done
 
 test: $(DIRS)
 	for d in $(DIRS); do \
-	    make -C $$d test; \
+		make -C $$d test; \
 	done
 
 clean: $(DIRS)
 	for d in $(DIRS); do \
-	    make -C $$d clean; \
+		make -C $$d clean; \
 	done

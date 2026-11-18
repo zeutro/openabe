@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -48,19 +48,23 @@ using namespace std;
 using namespace oabe;
 using namespace oabe::crypto;
 
-#define COLOR_STR_GREEN   "\033[32m"
-#define COLOR_STR_NORMAL  "\033[0m"
-#define COLOR_STR_RED     "\033[31m"
+#define COLOR_STR_GREEN "\033[32m"
+#define COLOR_STR_NORMAL "\033[0m"
+#define COLOR_STR_RED "\033[31m"
 
-#define EXIT(msg)   cout << msg << endl; goto CLEANUP
-#define NUM_PAIRING_TESTS           10
-#define ASSERT_RESULT(condition, msg)   if(condition) { \
-    cout << "FAIL: " << msg << endl; \
-    return false; }
+#define EXIT(msg)                                                                                  \
+  cout << msg << endl;                                                                             \
+  goto CLEANUP
+#define NUM_PAIRING_TESTS 10
+#define ASSERT_RESULT(condition, msg)                                                              \
+  if (condition) {                                                                                 \
+    cout << "FAIL: " << msg << endl;                                                               \
+    return false;                                                                                  \
+  }
 
 // Global test counters
-uint32_t    gNumTests        = 0;
-uint32_t    gSuccessfulTests = 0;
+uint32_t gNumTests = 0;
+uint32_t gSuccessfulTests = 0;
 #define TEST_DESCRIPTION(desc) RecordProperty("description", desc)
 #define TESTSUITE_DESCRIPTION(desc) ::testing::Test::RecordProperty("description", desc)
 
@@ -95,7 +99,7 @@ TEST_F(ZeutroMathLib, InitZP) {
 TEST_F(ZeutroMathLib, InitPairingGroup) {
   TEST_DESCRIPTION("Testing that pairing group init works as expected");
   int len = 0;
-  char *str = zml_bignum_toHex(pgroup_->order, &len);
+  char* str = zml_bignum_toHex(pgroup_->order, &len);
   string s0 = string(str, len);
   zml_bignum_safe_free(str);
   cout << "order: " << s0 << endl;
@@ -197,8 +201,8 @@ TEST_F(ZeutroMathLib, DivideZPByAConstant) {
 
   ZP y1 = x / ZP(2);
   ZP y2 = x / ZP(-2);
-  cout << "x / 2 = " <<  y1 << endl;
-  cout << "x / -2 = " <<  y2 << endl;
+  cout << "x / 2 = " << y1 << endl;
+  cout << "x / -2 = " << y2 << endl;
 
   ASSERT_EQ(x, y1 * ZP(2));
   ASSERT_EQ(x, y2 * ZP(-2));
@@ -334,7 +338,6 @@ TEST_F(ZeutroMathLib, HashToG1) {
   ASSERT_TRUE(F != H);
 }
 
-
 ////// G2 unit tests //////
 TEST_F(ZeutroMathLib, RandomG2) {
   TEST_DESCRIPTION("Testing that random G2 works correctly");
@@ -406,7 +409,7 @@ TEST_F(ZeutroMathLib, MulGTTests) {
   TEST_DESCRIPTION("Testing that multiplication with GT works correctly");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt1 = pgroup_->pairing(g1,g2);
+  GT gt1 = pgroup_->pairing(g1, g2);
 
   GT h = gt1 * gt1;
   ASSERT_EQ(gt1, h / gt1);
@@ -416,7 +419,7 @@ TEST_F(ZeutroMathLib, DivGTTests) {
   TEST_DESCRIPTION("Testing that division with GT works correctly");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt1 = pgroup_->pairing(g1,g2);
+  GT gt1 = pgroup_->pairing(g1, g2);
 
   GT h = gt1 / gt1;
   ASSERT_EQ(gt1, h * gt1);
@@ -426,7 +429,7 @@ TEST_F(ZeutroMathLib, NegateGTTests) {
   TEST_DESCRIPTION("Testing that negation with GT works correctly");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt = pgroup_->pairing(g1,g2);
+  GT gt = pgroup_->pairing(g1, g2);
 
   GT k = -gt;
   cout << "(negation) k = -gt: " << k << endl;
@@ -437,7 +440,7 @@ TEST_F(ZeutroMathLib, ExpGTTests) {
   TEST_DESCRIPTION("Testing that exponentiation with GT works correctly");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt = pgroup_->pairing(g1,g2);
+  GT gt = pgroup_->pairing(g1, g2);
 
   ZP r = pgroup_->randomZP(rng_.get());
   GT a = gt.exp(r);
@@ -451,7 +454,7 @@ TEST_F(ZeutroMathLib, SerializeGT) {
   TEST_DESCRIPTION("Testing that GT serialize/deserialize works correctly");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt = pgroup_->pairing(g1,g2);
+  GT gt = pgroup_->pairing(g1, g2);
 
   OpenABEByteString tmp;
   gt.serialize(tmp);
@@ -466,14 +469,13 @@ TEST_F(ZeutroMathLib, MembershipTestGT) {
   TEST_DESCRIPTION("Testing that GT membership check is correct");
   G1 g1 = pgroup_->randomG1(rng_.get());
   G2 g2 = pgroup_->randomG2(rng_.get());
-  GT gt = pgroup_->pairing(g1,g2);
+  GT gt = pgroup_->pairing(g1, g2);
   ASSERT_TRUE(gt.ismember(pgroup_->order));
 }
 
-}
+} // namespace
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
   int rc;
 
   InitializeOpenABE();

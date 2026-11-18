@@ -1,0 +1,125 @@
+name: Bug report
+description: Something does not build, crashes, or behaves differently than documented.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        **Security vulnerabilities must not be reported here.** Use the "Report a security vulnerability" link on the previous page instead.
+
+        Before opening: check the [FAQ](https://github.com/Claudiocli/openabe/wiki/FAQ) and [Known Limitations](https://github.com/Claudiocli/openabe/wiki/Known-Limitations). Many build problems come from not running `. ./env` in the current shell.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Build / dependencies (make, deps/, env)
+        - C++ library (libopenabe)
+        - CLI tools (oabe_setup, oabe_keygen, oabe_enc, oabe_dec)
+        - Python bindings (pyopenabe)
+        - Examples
+        - CI / GitHub Actions
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scheme
+    attributes:
+      label: Scheme involved
+      multiple: true
+      options:
+        - CP-ABE
+        - KP-ABE
+        - PK-ENC
+        - ECDSA
+        - Symmetric (SKE)
+        - Not scheme-specific
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux (Ubuntu / Debian)
+        - Linux (other distribution)
+        - Windows (MSYS2 MinGW64)
+        - Windows (other environment)
+        - macOS
+        - Android
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: platform-details
+    attributes:
+      label: OS and compiler versions
+      description: e.g. output of `uname -a` and `g++ --version`
+      placeholder: "Ubuntu 24.04, g++ 13.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: commit
+    attributes:
+      label: OpenABE commit
+      description: Output of `git rev-parse --short HEAD`
+      placeholder: "32b8550"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        The exact commands or a minimal code sample. For policy or attribute problems, include the **exact strings** you passed to `keygen` / `encrypt` (or `-i` / `-e` in the CLI). Never paste real keys or master secret parameters.
+      placeholder: |
+        . ./env
+        make
+        ...
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output and error messages
+      description: |
+        Compiler or linker errors, exception messages, or the CLI exit code (see [Error Codes](https://github.com/Claudiocli/openabe/wiki/Error-Codes)). For build failures, include the **first** error, not only the last lines.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched the existing issues and this is not a duplicate.
+          required: true
+        - label: I ran `. ./env` in the shell where the problem happens.
+          required: true
+        - label: The report contains no secret keys, master secret parameters or confidential data.
+          required: true

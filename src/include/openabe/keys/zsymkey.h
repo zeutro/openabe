@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -35,6 +35,8 @@
 #ifndef __ZSYMKEY_H__
 #define __ZSYMKEY_H__
 
+#include <cstdint>
+
 #include <openabe/openabe.h>
 #include <openssl/aes.h>
 #include <openssl/rand.h>
@@ -45,9 +47,9 @@ namespace oabe {
 ///
 /// Macro definitions
 ///
-#define IV_STR	"IV"
-#define CT_STR	"Ciphertext"
-#define TG_STR	"Tag"
+#define IV_STR "IV"
+#define CT_STR "Ciphertext"
+#define TG_STR "Tag"
 
 ///
 /// @class  OpenABESymKey
@@ -58,7 +60,7 @@ namespace oabe {
 class OpenABESymKey : public OpenABEKey {
 protected:
   OpenABEByteString m_keyData;
-    
+
 public:
   // Constructors/destructors
   OpenABESymKey();
@@ -66,20 +68,25 @@ public:
 
   // Methods
   std::string toString();
-  uint8_t *getInternalPtr() { return (uint8_t *)&((this->m_keyData)[0]); }
-  uint32_t getLength() { return this->m_keyData.size(); }
-  OpenABEByteString& getKeyBytes() { return (this->m_keyData); }
+  uint8_t* getInternalPtr() {
+    return (uint8_t*)&((this->m_keyData)[0]);
+  }
+  uint32_t getLength() {
+    return this->m_keyData.size();
+  }
+  OpenABEByteString& getKeyBytes() {
+    return (this->m_keyData);
+  }
 
-  bool hashToSymmetricKey(GT &input, uint32_t keyLen,
+  bool hashToSymmetricKey(GT& input, uint32_t keyLen,
                           OpenABEHashFunctionType hashType = OpenABE_DEFAULT_HASH_FUNCTION_TYPE);
   bool generateSymmetricKey(uint32_t keyLen);
-  void setSymmetricKey(OpenABEByteString &key);
+  void setSymmetricKey(OpenABEByteString& key);
 
-  OpenABE_ERROR exportKeyToBytes(OpenABEByteString &output);
-  OpenABE_ERROR loadKeyFromBytes(OpenABEByteString &input);
+  OpenABE_ERROR exportKeyToBytes(OpenABEByteString& output);
+  OpenABE_ERROR loadKeyFromBytes(OpenABEByteString& input);
   friend bool operator==(const OpenABESymKey&, const OpenABESymKey&);
 };
-
 
 ///
 /// @class  OpenABESymKeyEnc
@@ -89,22 +96,24 @@ public:
 
 class OpenABESymKeyEnc : ZObject {
 private:
-	int seclevel;
-	std::string guid, keyStr;
-	uint8_t iv[AES_BLOCK_SIZE+1];
-	AES_KEY *key;
-	bool status, iv_set;
+  int seclevel;
+  std::string guid, keyStr;
+  uint8_t iv[AES_BLOCK_SIZE + 1];
+  AES_KEY* key;
+  bool status, iv_set;
 
 public:
-	OpenABESymKeyEnc(std::string key);
-	OpenABESymKeyEnc(int securitylevel, std::string key);
-	OpenABESymKeyEnc(int securitylevel, uint8_t *iv, std::string key);
-	~OpenABESymKeyEnc();
+  OpenABESymKeyEnc(std::string key);
+  OpenABESymKeyEnc(int securitylevel, std::string key);
+  OpenABESymKeyEnc(int securitylevel, uint8_t* iv, std::string key);
+  ~OpenABESymKeyEnc();
 
-	void chooseRandomIV();
-	std::string encrypt(uint8_t *plaintext, uint32_t plaintext_len);
-	std::string decrypt(std::string ciphertext);
-	bool getDecryptionStatus() { return status; }
+  void chooseRandomIV();
+  std::string encrypt(uint8_t* plaintext, uint32_t plaintext_len);
+  std::string decrypt(std::string ciphertext);
+  bool getDecryptionStatus() {
+    return status;
+  }
 };
 
 ///
@@ -115,30 +124,30 @@ public:
 
 class OpenABESymKeyAuthEncStream : ZObject {
 private:
-	EVP_CIPHER *cipher;
-	EVP_CIPHER_CTX *ctx;
-	OpenABEByteString the_iv, aad;
+  EVP_CIPHER* cipher;
+  EVP_CIPHER_CTX* ctx;
+  OpenABEByteString the_iv, aad;
 
-	std::shared_ptr<OpenABESymKey> key;
-	bool aad_set, init_enc_set, init_dec_set;
-	size_t total_ct_len, updateEncCount, updateDecCount;
+  std::shared_ptr<OpenABESymKey> key;
+  bool aad_set, init_enc_set, init_dec_set;
+  size_t total_ct_len, updateEncCount, updateDecCount;
 
 public:
-	OpenABESymKeyAuthEncStream(int securitylevel, const std::shared_ptr<OpenABESymKey>& key);
-	~OpenABESymKeyAuthEncStream();
+  OpenABESymKeyAuthEncStream(int securitylevel, const std::shared_ptr<OpenABESymKey>& key);
+  ~OpenABESymKeyAuthEncStream();
 
-	void initAddAuthData(uint8_t *aad, uint32_t aad_len);
-	OpenABE_ERROR setAddAuthData(void);
+  void initAddAuthData(uint8_t* aad, uint32_t aad_len);
+  OpenABE_ERROR setAddAuthData(void);
 
-	OpenABE_ERROR	 encryptInit(OpenABEByteString *iv);
-	OpenABE_ERROR 	 encryptUpdate(OpenABEByteString *plaintextBlock, OpenABEByteString *ciphertext);
-	OpenABE_ERROR 	 encryptFinalize(OpenABEByteString* ciphertext, OpenABEByteString *tag);
+  OpenABE_ERROR encryptInit(OpenABEByteString* iv);
+  OpenABE_ERROR encryptUpdate(OpenABEByteString* plaintextBlock, OpenABEByteString* ciphertext);
+  OpenABE_ERROR encryptFinalize(OpenABEByteString* ciphertext, OpenABEByteString* tag);
 
-	OpenABE_ERROR	 decryptInit(OpenABEByteString *iv, OpenABEByteString *tag);
-	OpenABE_ERROR	 decryptUpdate(OpenABEByteString *ciphertextBlock, OpenABEByteString *plaintext);
-	OpenABE_ERROR	 decryptFinalize(OpenABEByteString *plaintext);
+  OpenABE_ERROR decryptInit(OpenABEByteString* iv, OpenABEByteString* tag);
+  OpenABE_ERROR decryptUpdate(OpenABEByteString* ciphertextBlock, OpenABEByteString* plaintext);
+  OpenABE_ERROR decryptFinalize(OpenABEByteString* plaintext);
 };
 
-}
+} // namespace oabe
 
 #endif /* ifdef  __ZSYMKEY_H__ */

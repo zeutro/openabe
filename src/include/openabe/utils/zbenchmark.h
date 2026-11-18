@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -39,28 +39,32 @@
 #include <sstream>
 #include <map>
 
-#define MAX_LIST	10000000
+#define MAX_LIST 10000000
 
-class Benchmark  {
+class Benchmark {
 public:
-	Benchmark() { initBench = true; sum = 0.0; iterationCount = 0; };
-	~Benchmark() { };
-	void start();
-	void stop();
-	double computeTimeInMilliseconds();
-	int getTimeInMicroseconds();
-	std::string getRawResultString();
-	double getAverage();
+  Benchmark() {
+    initBench = true;
+    sum = 0.0;
+    iterationCount = 0;
+  };
+  ~Benchmark() {};
+  void start();
+  void stop();
+  double computeTimeInMilliseconds();
+  int getTimeInMicroseconds();
+  std::string getRawResultString();
+  double getAverage();
 
 private:
-	std::chrono::system_clock::time_point startT, endT;
-	double sum;
-	int iterationCount;
-	std::stringstream ss;
-	bool initBench;
+  std::chrono::system_clock::time_point startT, endT;
+  double sum;
+  int iterationCount;
+  std::stringstream ss;
+  bool initBench;
 };
 
-class ListStr  {
+class ListStr {
 public:
   ListStr(void);
   ~ListStr();
@@ -77,8 +81,8 @@ public:
   friend std::ostream& operator<<(std::ostream&, const ListStr&);
 
 private:
-	int index;
-	std::map<int, std::string> list;
+  int index;
+  std::map<int, std::string> list;
 };
 
 bool CheckEqual(std::string value1, std::string value2);

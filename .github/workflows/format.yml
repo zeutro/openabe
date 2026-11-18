@@ -1,0 +1,59 @@
+name: Check code formatting
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+env:
+  # Pinned: different clang-format releases produce different output.
+  # Keep in sync with CONTRIBUTING.md.
+  CLANG_FORMAT_VERSION: "18.1.8"
+
+jobs:
+  clang-format:
+    name: Check C/C++ formatting
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          pipx install "clang-format==${CLANG_FORMAT_VERSION}"
+          clang-format --version
+
+      - name: Check formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Generated files are skipped via .clang-format-ignore.
+          mapfile -d '' files < <(
+            git ls-files -z \
+              '*.c' '*.cc' '*.cpp' '*.cxx' \
+              '*.h' '*.hh' '*.hpp' '*.hxx' \
+              ':(exclude)deps/**'
+          )
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No C/C++ files found."
+            exit 0
+          fi
+
+          clang-format -i --style=file "${files[@]}"
+
+          if ! git diff --quiet; then
+            echo "::error::Some files are not formatted according to .clang-format."
+            echo "Run: clang-format -i --style=file <files> (clang-format ${CLANG_FORMAT_VERSION})"
+            git --no-pager diff --stat
+            git --no-pager diff
+            exit 1
+          fi

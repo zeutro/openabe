@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -33,13 +33,13 @@
 
 #define __ZPAIRING_CPP__
 
+#include <fstream>
+#include <iostream>
+#include <math.h>
+#include <openabe/openabe.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <iostream>
-#include <fstream>
 #include <string>
-#include <openabe/openabe.h>
 
 extern "C" {
 #include <openabe/zml/zelement.h>
@@ -56,9 +56,7 @@ namespace oabe {
  * @return OpenABE_NOERROR or an error code
  */
 
-OpenABE_ERROR
-zMathInitLibrary()
-{
+OpenABE_ERROR zMathInitLibrary() {
   // Initialize ZML
   zml_init();
   return OpenABE_NOERROR;
@@ -70,9 +68,7 @@ zMathInitLibrary()
  * @return OpenABE_NOERROR or an error code
  */
 
-OpenABE_ERROR
-zMathShutdownLibrary()
-{
+OpenABE_ERROR zMathShutdownLibrary() {
   // Cleanup ZML
   zml_clean();
   return OpenABE_NOERROR;
@@ -84,9 +80,7 @@ zMathShutdownLibrary()
  * @return The pairing object or NULL
  */
 
-OpenABEPairing*
-OpenABE_createNewPairing(const string &pairingParams)
-{
+OpenABEPairing* OpenABE_createNewPairing(const string& pairingParams) {
   return new OpenABEPairing(pairingParams);
 }
 
@@ -97,14 +91,11 @@ OpenABE_createNewPairing(const string &pairingParams)
  * @return The corresponding ID string or NULL
  */
 
-string
-OpenABE_pairingParamsForSecurityLevel(OpenABESecurityLevel securityLevel)
-{
-  if(securityLevel == 128)
+string OpenABE_pairingParamsForSecurityLevel(OpenABESecurityLevel securityLevel) {
+  if (securityLevel == 128)
     return "BN_P256";
   return "";
 }
-
 
 /********************************************************************************
  * Implementation of the OpenABEPairing class
@@ -115,13 +106,12 @@ OpenABE_pairingParamsForSecurityLevel(OpenABESecurityLevel securityLevel)
  *
  */
 
-OpenABEPairing::OpenABEPairing(const string &pairingParams) : ZObject()
-{    
+OpenABEPairing::OpenABEPairing(const string& pairingParams) : ZObject() {
   AssertLibInit();
   // Look up the pairing parameters and set them
   this->curveID = getPairingCurveID(pairingParams);
 
-  this->bpgroup  = make_shared<BPGroup>(this->curveID);
+  this->bpgroup = make_shared<BPGroup>(this->curveID);
   zml_bignum_init(&this->order);
   this->bpgroup->getGroupOrder(this->order);
 }
@@ -130,8 +120,7 @@ OpenABEPairing::OpenABEPairing(const string &pairingParams) : ZObject()
  * Constructor for the OpenABEPairing class.
  *
  */
-OpenABEPairing::OpenABEPairing(const OpenABEPairing &copyFrom) : ZObject()
-{
+OpenABEPairing::OpenABEPairing(const OpenABEPairing& copyFrom) : ZObject() {
   AssertLibInit();
   // copy the pairing params first
   string pairingParams = copyFrom.getPairingParams();
@@ -139,7 +128,7 @@ OpenABEPairing::OpenABEPairing(const OpenABEPairing &copyFrom) : ZObject()
   // Look up the pairing parameters and set them in RELIC
   this->curveID = getPairingCurveID(pairingParams);
 
-  this->bpgroup  = make_shared<BPGroup>(this->curveID);
+  this->bpgroup = make_shared<BPGroup>(this->curveID);
   zml_bignum_init(&this->order);
   this->bpgroup->getGroupOrder(this->order);
 }
@@ -148,44 +137,33 @@ OpenABEPairing::OpenABEPairing(const OpenABEPairing &copyFrom) : ZObject()
  * Destructor for the OpenABEPairing class.
  *
  */
-OpenABEPairing::~OpenABEPairing()
-{
+OpenABEPairing::~OpenABEPairing() {
   zml_bignum_free(order);
   this->bpgroup.reset();
 }
 
-void
-OpenABEPairing::initZP(ZP& result, uint32_t v)
-{
+void OpenABEPairing::initZP(ZP& result, uint32_t v) {
   result = v;
   result.setOrder(order);
 }
 
-ZP
-OpenABEPairing::initZP()
-{
-  ZP z = (uint32_t) 0;
+ZP OpenABEPairing::initZP() {
+  ZP z = (uint32_t)0;
   z.setOrder(order);
   return z;
 }
 
-G1
-OpenABEPairing::initG1()
-{
+G1 OpenABEPairing::initG1() {
   G1 g(this->bpgroup);
   return g;
 }
 
-G2
-OpenABEPairing::initG2()
-{
+G2 OpenABEPairing::initG2() {
   G2 g(this->bpgroup);
   return g;
 }
 
-GT
-OpenABEPairing::initGT()
-{
+GT OpenABEPairing::initGT() {
   GT g(this->bpgroup);
   return g;
 }
@@ -195,9 +173,7 @@ OpenABEPairing::initGT()
  *
  * @return group element in ZP
  */
-ZP
-OpenABEPairing::randomZP(OpenABERNG *rng)
-{
+ZP OpenABEPairing::randomZP(OpenABERNG* rng) {
   ASSERT_NOTNULL(rng);
   ZP result;
   result.setRandom(rng, order);
@@ -209,13 +185,11 @@ OpenABEPairing::randomZP(OpenABERNG *rng)
  *
  * @return group element in G1
  */
-G1
-OpenABEPairing::randomG1(OpenABERNG *rng)
-{
-	ASSERT_NOTNULL(rng);
-	G1 result(this->bpgroup);
-	result.setRandom(rng);
-	return result;
+G1 OpenABEPairing::randomG1(OpenABERNG* rng) {
+  ASSERT_NOTNULL(rng);
+  G1 result(this->bpgroup);
+  result.setRandom(rng);
+  return result;
 }
 
 /*!
@@ -223,18 +197,14 @@ OpenABEPairing::randomG1(OpenABERNG *rng)
  *
  * @return group element in G2
  */
-G2
-OpenABEPairing::randomG2(OpenABERNG *rng)
-{
-	ASSERT_NOTNULL(rng);
-	G2 result(this->bpgroup);
-	result.setRandom(rng);
-	return result;
+G2 OpenABEPairing::randomG2(OpenABERNG* rng) {
+  ASSERT_NOTNULL(rng);
+  G2 result(this->bpgroup);
+  result.setRandom(rng);
+  return result;
 }
 
-G1
-OpenABEPairing::hashToG1(OpenABEByteString& keyPrefix, string msg)
-{
+G1 OpenABEPairing::hashToG1(OpenABEByteString& keyPrefix, string msg) {
   ASSERT_PAIRING(this);
   OpenABEByteString tmp;
   // set the key prefix
@@ -246,27 +216,24 @@ OpenABEPairing::hashToG1(OpenABEByteString& keyPrefix, string msg)
   G1 g1(this->bpgroup);
   std::string digest, str = tmp.toString();
   oabe::sha256(digest, str);
-  uint8_t *xstr = (uint8_t *)digest.c_str();
+  uint8_t* xstr = (uint8_t*)digest.c_str();
   size_t xstr_len = digest.size();
   g1_map_op(GET_BP_GROUP(this->bpgroup), g1.m_G1, xstr, xstr_len);
   return g1;
 }
 
-GT
-OpenABEPairing::pairing(G1& g1, G2& g2)
-{
+GT OpenABEPairing::pairing(G1& g1, G2& g2) {
   GT result(this->bpgroup);
   bp_map_op(GET_BP_GROUP(this->bpgroup), result.m_GT, g1.m_G1, g2.m_G2);
-  if(result.isInfinity()) {
+  if (result.isInfinity()) {
     result.setIdentity();
   }
   return result;
 }
 
-void
-OpenABEPairing::multi_pairing(GT& gt, std::vector<G1>& g1, std::vector<G2>& g2) {
+void OpenABEPairing::multi_pairing(GT& gt, std::vector<G1>& g1, std::vector<G2>& g2) {
   multi_bp_map_op(GET_BP_GROUP(this->bpgroup), gt, g1, g2);
-  if(gt.isInfinity()) {
+  if (gt.isInfinity()) {
     gt.setIdentity();
   }
 }
@@ -277,9 +244,7 @@ OpenABEPairing::multi_pairing(GT& gt, std::vector<G1>& g1, std::vector<G2>& g2) 
  * @return Pairing parameters string
  */
 
-string
-OpenABEPairing::getPairingParams() const
-{
+string OpenABEPairing::getPairingParams() const {
   return this->pairingParams;
 }
 
@@ -289,9 +254,7 @@ OpenABEPairing::getPairingParams() const
  * @return Pairing parameters ID
  */
 
-OpenABECurveID
-OpenABEPairing::getCurveID() const
-{
+OpenABECurveID OpenABEPairing::getCurveID() const {
   return this->curveID;
 }
 
@@ -302,9 +265,7 @@ OpenABEPairing::getCurveID() const
  * @return An int representing the parameters, or -1 if not found.
  */
 
-OpenABECurveID
-getPairingCurveID(const string &paramsID)
-{
+OpenABECurveID getPairingCurveID(const string& paramsID) {
   OpenABECurveID curveID = OpenABE_NONE_ID;
 
   if (paramsID == "BN_P254") {
@@ -321,9 +282,7 @@ getPairingCurveID(const string &paramsID)
   return curveID;
 }
 
-OpenABEByteString
-OpenABEPairing::hashToBytes(uint8_t *buf, uint32_t buf_len)
-{
+OpenABEByteString OpenABEPairing::hashToBytes(uint8_t* buf, uint32_t buf_len) {
   uint8_t hash[SHA256_LEN];
   sha256(hash, buf, buf_len);
 
@@ -334,31 +293,31 @@ OpenABEPairing::hashToBytes(uint8_t *buf, uint32_t buf_len)
 
 // implements a variable-sized hash function
 // block_len = len / md_len ... rounding up
-// H(00 || hash_byte || m) || H(01 || hash_byte || m) || ... || H(n || hash_byte || m)
+// H(00 || hash_byte || m) || H(01 || hash_byte || m) || ... || H(n || hash_byte
+// || m)
 // ... where 'n' is block_len and 'm' is message
-OpenABEByteString
-OpenABEPairing::hashFromBytes(OpenABEByteString &buf, uint32_t target_len, uint8_t hash_prefix)
-{
+OpenABEByteString OpenABEPairing::hashFromBytes(OpenABEByteString& buf, uint32_t target_len,
+                                                uint8_t hash_prefix) {
   // compute number of hash blocks needed
   int block_len = ceil(((double)target_len) / SHA256_LEN);
   // set the hash_len
   int hash_len = block_len * SHA256_LEN;
-  uint8_t hash[hash_len+1];
-  memset(hash, 0, hash_len+1);
+  uint8_t hash[hash_len + 1];
+  memset(hash, 0, hash_len + 1);
 
   OpenABEByteString buf2 = buf;
   uint8_t count = 0;
 
   buf2.insertFirstByte(hash_prefix);
   buf2.insertFirstByte(count);
-  uint8_t *ptr = buf2.getInternalPtr();
-  uint8_t *hash_ptr = hash;
+  uint8_t* ptr = buf2.getInternalPtr();
+  uint8_t* hash_ptr = hash;
 
-  for(int i = 0; i < block_len; i++) {
+  for (int i = 0; i < block_len; i++) {
     // H(count || hash_prefix || buf)
     sha256(hash_ptr, buf2.getInternalPtr(), buf2.size());
     count++;
-    ptr[0] = count;      // change block number
+    ptr[0] = count;         // change block number
     hash_ptr += SHA256_LEN; // move ptr by SHA256_LEN size
   }
 
@@ -367,4 +326,4 @@ OpenABEPairing::hashFromBytes(OpenABEByteString &buf, uint32_t target_len, uint8
   return b;
 }
 
-}
+} // namespace oabe

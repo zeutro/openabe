@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -28,20 +28,21 @@
 ///
 /// \brief  Implementation of the Waters '11 CP-ABE scheme.
 ///
-/// \source http://eprint.iacr.org/2008/290.pdf (Appendix A -- Large Universe Construction)
+/// \source http://eprint.iacr.org/2008/290.pdf (Appendix A -- Large Universe
+/// Construction)
 ///
 /// \author J. Ayo Akinyele
 ///
 
 #define __ZCONTEXTCPWATERS_CPP__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <openabe/openabe.h>
 #include <openabe/utils/zcryptoutils.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
 
 using namespace std;
 
@@ -54,8 +55,7 @@ namespace oabe {
  * Constructor for the OpenABEContextCPWaters class.
  *
  */
-OpenABEContextCPWaters::OpenABEContextCPWaters(unique_ptr<OpenABERNG> rng)
-    : OpenABEContextABE() {
+OpenABEContextCPWaters::OpenABEContextCPWaters(unique_ptr<OpenABERNG> rng) : OpenABEContextABE() {
   this->debug = false;
   // KEM context will take ownership of the given RNG
   this->m_RNG_ = move(rng);
@@ -73,17 +73,18 @@ OpenABEContextCPWaters::~OpenABEContextCPWaters() {}
  * scheme. This function takes in a specific set of pairing parameters.
  *
  * @param[in] pairingParams     - Identifier for the pairing parameters.
- * @param[in] mpkID             - Identifier to use for the new Master Public Key
- * @param[in] mskID             - Identifier to use for the new Master Secret Key
+ * @param[in] mpkID             - Identifier to use for the new Master Public
+ * Key
+ * @param[in] mskID             - Identifier to use for the new Master Secret
+ * Key
  * @return                      - An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextCPWaters::generateParams(const string pairingParams,
-                                   const string &mpkID, const string &mskID) {
+OpenABE_ERROR OpenABEContextCPWaters::generateParams(const string pairingParams,
+                                                     const string& mpkID, const string& mskID) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> MPK = nullptr, MSK = nullptr;
-  OpenABERNG *myRNG = this->getRNG();
+  OpenABERNG* myRNG = this->getRNG();
   OpenABEByteString k;
 
   try {
@@ -131,13 +132,12 @@ OpenABEContextCPWaters::generateParams(const string pairingParams,
     this->getKeystore()->addKey(mpkID, MPK, KEY_TYPE_PUBLIC);
     this->getKeystore()->addKey(mskID, MSK, KEY_TYPE_SECRET);
 
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
   return result;
 }
-
 
 /*!
  * Generate a decryption key for a given function input. This function
@@ -146,25 +146,26 @@ OpenABEContextCPWaters::generateParams(const string pairingParams,
  * @param[in] mpkID     - parameter ID of the Master Public Key
  * @param[in] mskID     - parameter ID of the Master Secret Key
  * @param[in] keyID     - parameter ID of the decryption key to be created
- * @param[in] keyInput  - A OpenABEAttributeList structure for the key to be constructed
+ * @param[in] keyInput  - A OpenABEAttributeList structure for the key to be
+ * constructed
  * @return              - An error code or OpenABE_NOERROR.
  */
 
 OpenABE_ERROR
-OpenABEContextCPWaters::generateDecryptionKey(
-    OpenABEFunctionInput *keyInput, const string &keyID, const string &mpkID,
-    const string &mskID, const string &gpkID = "", const string &GID = "") {
+OpenABEContextCPWaters::generateDecryptionKey(OpenABEFunctionInput* keyInput, const string& keyID,
+                                              const string& mpkID, const string& mskID,
+                                              const string& gpkID = "", const string& GID = "") {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> decKey = nullptr;
-  OpenABEAttributeList *attrList = nullptr;
-  OpenABERNG *myRNG = this->getRNG();
-  OpenABEByteString *k = nullptr;
+  OpenABEAttributeList* attrList = nullptr;
+  OpenABERNG* myRNG = this->getRNG();
+  OpenABEByteString* k = nullptr;
 
   try {
     // Ensure that the given input is a OpenABEAttributeList
-    if ((attrList = dynamic_cast<OpenABEAttributeList *>(keyInput)) == nullptr) {
+    if ((attrList = dynamic_cast<OpenABEAttributeList*>(keyInput)) == nullptr) {
       OpenABE_LOG_AND_THROW("Decryption key input must be an Attribute List",
-                        OpenABE_ERROR_INVALID_INPUT);
+                            OpenABE_ERROR_INVALID_INPUT);
     }
 
     // Load the master secret and public key
@@ -176,8 +177,7 @@ OpenABEContextCPWaters::generateDecryptionKey(
     // retrieve the hash function key prefix
     k = MPK->getByteString("k");
     // Create a new OpenABEKey object for the decryption key
-    decKey.reset(
-        new OpenABEKey(this->getPairing()->getCurveID(), this->algID, keyID));
+    decKey.reset(new OpenABEKey(this->getPairing()->getCurveID(), this->algID, keyID));
 
     // Add the attribute list to the key
     decKey->setComponent("input", attrList);
@@ -196,7 +196,7 @@ OpenABEContextCPWaters::generateDecryptionKey(
 
     // For each attribute in the attribute list
     string attr, attr_deckey;
-    const vector<string> *attrStrings = attrList->getAttributeList();
+    const vector<string>* attrStrings = attrList->getAttributeList();
     for (auto it = attrStrings->begin(); it != attrStrings->end(); ++it) {
       // Compute KX_{attribute} = hash_to_G1(attribute)^t
       attr = *it;
@@ -208,7 +208,7 @@ OpenABEContextCPWaters::generateDecryptionKey(
     // Add the decryption key to the keystore
     this->getKeystore()->addKey(keyID, decKey, KEY_TYPE_SECRET);
 
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -224,15 +224,14 @@ OpenABEContextCPWaters::generateDecryptionKey(
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextCPWaters::encryptKEM(OpenABERNG *rng, const string &mpkID,
-                               const OpenABEFunctionInput *encryptInput,
-                               uint32_t keyByteLen,
-                               const std::shared_ptr<OpenABESymKey> &key,
-                               OpenABECiphertext *ciphertext) {
+OpenABE_ERROR OpenABEContextCPWaters::encryptKEM(OpenABERNG* rng, const string& mpkID,
+                                                 const OpenABEFunctionInput* encryptInput,
+                                                 uint32_t keyByteLen,
+                                                 const std::shared_ptr<OpenABESymKey>& key,
+                                                 OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
-  OpenABERNG *myRNG = this->getRNG();
-  OpenABEByteString *k = nullptr;
+  OpenABERNG* myRNG = this->getRNG();
+  OpenABEByteString* k = nullptr;
 
   try {
     ASSERT_NOTNULL(key);
@@ -246,10 +245,9 @@ OpenABEContextCPWaters::encryptKEM(OpenABERNG *rng, const string &mpkID,
     ASSERT_NOTNULL(myRNG);
 
     // Ensure that the given input is a OpenABEPolicy
-    const OpenABEPolicy *policy = dynamic_cast<const OpenABEPolicy *>(encryptInput);
+    const OpenABEPolicy* policy = dynamic_cast<const OpenABEPolicy*>(encryptInput);
     if (policy == nullptr) {
-      OpenABE_LOG_AND_THROW("Encryption input must be a Policy",
-                        OpenABE_ERROR_INVALID_INPUT);
+      OpenABE_LOG_AND_THROW("Encryption input must be a Policy", OpenABE_ERROR_INVALID_INPUT);
     }
     // Load the master public key
     shared_ptr<OpenABEKey> MPK = this->getKeystore()->getPublicKey(mpkID);
@@ -300,7 +298,7 @@ OpenABEContextCPWaters::encryptKEM(OpenABERNG *rng, const string &mpkID,
     key->hashToSymmetricKey(C, keyByteLen, HASH_FUNCTION_TYPE_SHA256);
     ciphertext->setHeader(this->getPairing()->getCurveID(), this->algID, myRNG);
 
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -318,15 +316,14 @@ OpenABEContextCPWaters::encryptKEM(OpenABERNG *rng, const string &mpkID,
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextCPWaters::decryptKEM(const string &mpkID, const string &keyID,
-                               OpenABECiphertext *ciphertext, uint32_t keyByteLen,
-                               const std::shared_ptr<OpenABESymKey> &key) {
+OpenABE_ERROR OpenABEContextCPWaters::decryptKEM(const string& mpkID, const string& keyID,
+                                                 OpenABECiphertext* ciphertext, uint32_t keyByteLen,
+                                                 const std::shared_ptr<OpenABESymKey>& key) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   ZP coeff;
   G1 prod1 = this->getPairing()->initG1();
   G1 *Kx, *Cx;
-  G2 *Dx;
+  G2* Dx;
   GT prodT = this->getPairing()->initGT();
 
   try {
@@ -336,8 +333,7 @@ OpenABEContextCPWaters::decryptKEM(const string &mpkID, const string &keyID,
     shared_ptr<OpenABEKey> decKey = this->getKeystore()->getSecretKey(keyID);
     ASSERT_NOTNULL(decKey);
     // Obtain the attribute list from the decryption key
-    OpenABEAttributeList *attrList =
-        (OpenABEAttributeList *)decKey->getComponent("input");
+    OpenABEAttributeList* attrList = (OpenABEAttributeList*)decKey->getComponent("input");
 
     // Initialize an LSSS structure. Given an attribute list and policy
     // it will identify the necessary solution and return the appropriate
@@ -345,7 +341,7 @@ OpenABEContextCPWaters::decryptKEM(const string &mpkID, const string &keyID,
     // If the policy is not satisfied, it throws an error.
     OpenABELSSS lsss(this->getPairing(), this->getRNG());
 
-    OpenABEByteString *policy_str = ciphertext->getByteString("policy");
+    OpenABEByteString* policy_str = ciphertext->getByteString("policy");
     ASSERT_NOTNULL(policy_str);
 
     unique_ptr<OpenABEPolicy> policy = createPolicyTree(policy_str->toString());
@@ -375,22 +371,22 @@ OpenABEContextCPWaters::decryptKEM(const string &mpkID, const string &keyID,
     }
 
     this->getPairing()->multi_pairing(prodT, g1s, g2s);
-    G1 *Cprime = ciphertext->getG1("Cprime");
-    G2 *K = decKey->getG2("K");
-    G2 *L = decKey->getG2("L");
+    G1* Cprime = ciphertext->getG1("Cprime");
+    G2* K = decKey->getG2("K");
+    G2* L = decKey->getG2("L");
     ASSERT_NOTNULL(Cprime);
     ASSERT_NOTNULL(K);
     ASSERT_NOTNULL(L);
     // Now compute final = e(Cprime, K) / (prodT * e(prod1, L))
-    GT final = this->getPairing()->pairing(*Cprime, *K) /
-               (prodT * this->getPairing()->pairing(prod1, *L));
+    GT final =
+        this->getPairing()->pairing(*Cprime, *K) / (prodT * this->getPairing()->pairing(prod1, *L));
     // Compute key = hash_to_bitstring( prodT );
     key->hashToSymmetricKey(final, keyByteLen, HASH_FUNCTION_TYPE_SHA256);
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
   return result;
 }
 
-}
+} // namespace oabe

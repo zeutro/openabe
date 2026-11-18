@@ -7,42 +7,43 @@ NC='\033[0m'
 
 #set -x
 
-function assert()
-{
-    msg=$1; shift
-    expected=$1; shift
-    actual=$1; shift
-    printf "${PURPLE}[+] $msg:${NC} "
-    if [ "$expected" != "$actual" ]; then
-        printf "${RED}FAILED with ERROR=$actual${NC}\n"
-    else
-        printf "${GREEN}PASSED${NC}\n"
-    fi
+function assert() {
+	msg=$1
+	shift
+	expected=$1
+	shift
+	actual=$1
+	shift
+	printf "${PURPLE}[+] $msg:${NC} "
+	if [ "$expected" != "$actual" ]; then
+		printf "${RED}FAILED with ERROR=$actual${NC}\n"
+	else
+		printf "${GREEN}PASSED${NC}\n"
+	fi
 }
 
 function log() {
-    printf "${PURPLE}[+] $1${NC}\n"
+	printf "${PURPLE}[+] $1${NC}\n"
 }
 
 function log_test() {
-    printf "${PURPLE}- Testing $1${NC}\n"
+	printf "${PURPLE}- Testing $1${NC}\n"
 }
 
-
 function cleanup() {
-    file=$1
-    suffix=$2
-    rm plainOK.${file} *.${suffix}
-    rm -f *.key
+	file=$1
+	suffix=$2
+	rm plainOK.${file} *.${suffix}
+	rm -f *.key
 }
 
 function echo_line() {
-    echo "********************************************"
+	echo "********************************************"
 }
 
 if [ $# -eq 0 ]; then
-    log "No input file argument supplied. Exiting."
-    exit -1
+	log "No input file argument supplied. Exiting."
+	exit -1
 fi
 
 INPUT=$1
@@ -86,7 +87,6 @@ assert "Generate key for alice" 0 $?
 
 ./oabe_keygen -s CP -p org1 -i "Male|Doctor|Floor=5|Cardiologist" -o charlieCPABE
 assert "Generate key for bob" 0 $?
-
 
 echo_line
 # (Floor > 2 and Floor < 5)
@@ -139,6 +139,5 @@ assert "Decrypt second CT using the analyst's key -- should fail" 32 $?
 cleanup ${INPUT} kpabe
 
 #### TEST KP-ABE ####
-
 
 exit 0

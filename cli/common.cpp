@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -36,7 +36,7 @@
 using namespace std;
 using namespace oabe;
 
-void getFile(std::string &result, const std::string &filename) {
+void getFile(std::string& result, const std::string& filename) {
   result.clear();
 
   fstream fs(filename, fstream::in);
@@ -56,122 +56,133 @@ void getFile(std::string &result, const std::string &filename) {
   fs.close();
 }
 
-
-OpenABE_SCHEME checkForScheme(string type, string &suffix)
-{
-    suffix.clear();
-    if(type == CP_ABE) {
-    	suffix = ".cpabe";
-    	return OpenABE_SCHEME_CP_WATERS;
-    } else if(type == KP_ABE) {
-    	suffix = ".kpabe";
-    	return OpenABE_SCHEME_KP_GPSW;
-    } else if(type == PK_ENC) {
-        suffix = ".pkenc";
-        return OpenABE_SCHEME_PK_OPDH;
-    } else {
-    	return OpenABE_SCHEME_NONE;
-    }
+OpenABE_SCHEME checkForScheme(string type, string& suffix) {
+  suffix.clear();
+  if (type == CP_ABE) {
+    suffix = ".cpabe";
+    return OpenABE_SCHEME_CP_WATERS;
+  } else if (type == KP_ABE) {
+    suffix = ".kpabe";
+    return OpenABE_SCHEME_KP_GPSW;
+  } else if (type == PK_ENC) {
+    suffix = ".pkenc";
+    return OpenABE_SCHEME_PK_OPDH;
+  } else {
+    return OpenABE_SCHEME_NONE;
+  }
 }
 
-void addNameSeparator(string &prefix)
-{
-    // check if last character of prefix is a name separator (if not, add it)
-    if(prefix.size() > 0 && prefix[prefix.size()-1] != NAME_SEP) {
-    	prefix += NAME_SEP;
-    }
-    return;
+void addNameSeparator(string& prefix) {
+  // check if last character of prefix is a name separator (if not, add it)
+  if (prefix.size() > 0 && prefix[prefix.size() - 1] != NAME_SEP) {
+    prefix += NAME_SEP;
+  }
+  return;
 }
 
 // adds an extension if not present
-void addFileExtension(string &filename, string ext)
-{
-    if(filename.find(ext) == string::npos) {
-    	filename += ext;
+void addFileExtension(string& filename, string ext) {
+  if (filename.find(ext) == string::npos) {
+    filename += ext;
+  }
+  return;
+}
+
+// Drop the carriage return a CRLF line ending leaves behind.
+//
+// getline() splits on '\n' only. On Windows the text-mode reader used to
+// hide this by translating CRLF to LF, but that translation never happened
+// on Linux or macOS - so a file written by a Windows build kept a trailing
+// '\r' on every line when read anywhere else. Calling this after each
+// getline() makes every build read every build's files.
+static void stripCR(string& line) {
+  if (!line.empty() && line.back() == '\r') {
+    line.pop_back();
+  }
+}
+
+void WriteToFile(const char* filename, string outputStr) {
+  ofstream file;
+  // Binary, deliberately: these artifacts are a byte format that happens to
+  // be printable, not a text file. Opening in text mode made a Windows build
+  // expand every '\n' in the header/base64/footer to "\r\n", producing a
+  // file three bytes larger than the same artifact written anywhere else and
+  // - for a ciphertext, whose header ReadBlockFromFile() matches with an
+  // exact compare() - one that no other platform's build could read.
+  file.open(filename, ios::out | ios::binary);
+  file << outputStr;
+  file.close();
+}
+
+string ReadFile(const char* filename) {
+  ifstream input(filename);
+  string line = "";
+  // read everthing between the headers
+  if (input.is_open()) {
+    while (getline(input, line)) {
+      stripCR(line);
+      /* finish this
+      if(line.compare(begin_header) == 0)
+         continue;
+      */
+      if (line.find(BLOCK) == std::string::npos) {
+        break;
+      }
     }
-    return;
+    input.close();
+  }
+
+  return Base64Decode(line);
 }
 
-void WriteToFile(const char* filename, string outputStr)
-{
-    ofstream file;
-    file.open(filename);
-    file << outputStr;
-    file.close();
-}
-
-string ReadFile(const char* filename)
-{
-    ifstream input(filename);
-    string line = "";
-    // read everthing between the headers
-    if (input.is_open()) {
-    	while(getline(input, line)) {
-    		/* finish this
-    		if(line.compare(begin_header) == 0)
-    		   continue;
-    		*/
-    		if(line.find(BLOCK) == std::string::npos) {
-    			break;
-    		}
-    	}
-    	input.close();
+string ReadBlockFromFile(const char* begin_header, const char* end_header, const char* filename) {
+  ifstream input(filename);
+  string block = "", line;
+  bool found_header = false;
+  // read everthing between the headers
+  if (input.is_open()) {
+    while (getline(input, line)) {
+      stripCR(line);
+      if (line.compare(begin_header) == 0) {
+        found_header = true;
+        continue;
+      } else if (line.compare(end_header) == 0) {
+        break;
+      }
+      if (found_header)
+        block = line;
     }
+    input.close();
+  }
 
-    return Base64Decode(line);
+  return Base64Decode(block);
 }
 
-string ReadBlockFromFile(const char* begin_header, const char* end_header, const char* filename)
-{
-    ifstream input(filename);
-    string block = "", line;
-    bool found_header = false;
-    // read everthing between the headers
-    if(input.is_open()) {
-    	while(getline(input, line)) {
-    		if(line.compare(begin_header) == 0) {
-    		   found_header = true;
-    			continue;
-    		}
-    		else if(line.compare(end_header) == 0) {
-    			break;
-    		}
-    		if(found_header) block = line;
-    	}
-    	input.close();
+void WriteBinaryFile(const char* filename, string& outputStr) {
+  ofstream file;
+  file.open(filename, ios::out | ios::binary);
+  file << outputStr;
+  file.close();
+}
+
+void WriteBinaryFile(const char* filename, uint8_t* buf, uint32_t len) {
+  ofstream file;
+  file.open(filename, ios::out | ios::binary);
+  // file << outputStr;
+  file.write((const char*)buf, (int)len);
+  file.close();
+}
+
+string ReadBinaryFile(const char* filename) {
+  ifstream input(filename, ios::binary);
+  string inputBlob = "", line;
+  // read everthing between the headers
+  if (input.is_open()) {
+    while (getline(input, line)) {
+      inputBlob += line + "\n";
     }
+    input.close();
+  }
 
-    return Base64Decode(block);
-}
-
-void WriteBinaryFile(const char* filename, string& outputStr)
-{
-    ofstream file;
-    file.open(filename, ios::out | ios::binary);
-    file << outputStr;
-    file.close();
-}
-
-void WriteBinaryFile(const char* filename, uint8_t *buf, uint32_t len)
-{
-    ofstream file;
-    file.open(filename, ios::out | ios::binary);
-    // file << outputStr;
-    file.write((const char *) buf, (int) len);
-    file.close();
-}
-
-string ReadBinaryFile(const char* filename)
-{
-    ifstream input(filename, ios::binary);
-    string inputBlob = "", line;
-    // read everthing between the headers
-    if(input.is_open()) {
-    	while(getline(input, line)) {
-    		inputBlob += line + "\n";
-    	}
-    	input.close();
-    }
-
-    return inputBlob;
+  return inputBlob;
 }

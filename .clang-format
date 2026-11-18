@@ -1,0 +1,24 @@
+BasedOnStyle: LLVM
+
+Language: Cpp
+IndentWidth: 2
+TabWidth: 4
+UseTab: Never
+
+ColumnLimit: 100
+BreakBeforeBraces: Attach
+
+PointerAlignment: Left
+DerivePointerAlignment: false
+
+# Include order is significant: many headers are not self-contained and rely on
+# the order in openabe.h. Do not enable sorting until they are.
+SortIncludes: Never
+IncludeBlocks: Preserve
+
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: false
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false

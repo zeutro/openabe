@@ -1,0 +1,145 @@
+# --------------------------------------------------------------------
+# OpenABE build outputs
+# --------------------------------------------------------------------
+
+# Project build and install directories
+/build/
+/build-*/
+/root/
+/bin/
+/out/
+/output/
+
+# OpenABE generated binaries
+src/bench_libopenabe
+src/profile_libopenabe
+src/test_*
+src/*.so
+src/*.dylib
+src/*.a
+
+cli/oabe_setup
+cli/oabe_keygen
+cli/oabe_enc
+cli/oabe_dec
+cli/*.o
+cli/input.txt
+
+examples/*.o
+examples/*~
+
+
+# --------------------------------------------------------------------
+# C/C++ compilation artifacts
+# --------------------------------------------------------------------
+
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Dependency files
+*.d
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Debug and profiling files
+*.dSYM/
+*.pdb
+*.ilk
+*.dwo
+
+
+# --------------------------------------------------------------------
+# CMake and other build-system output
+# --------------------------------------------------------------------
+
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+Makefile.old
+
+
+# --------------------------------------------------------------------
+# Bundled dependency build output
+# --------------------------------------------------------------------
+
+deps/root/
+deps/openssl/openssl-*
+deps/relic/relic*
+deps/relic/tmp*
+deps/relic/.built
+deps/*.tar.gz
+vcpkg_installed/
+
+
+# --------------------------------------------------------------------
+# Tests and generated runtime files
+# --------------------------------------------------------------------
+
+Testing/
+.cache/
+*.log
+*.tmp
+test_result
+outpt
+
+
+# --------------------------------------------------------------------
+# Python bindings
+# --------------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+
+# --------------------------------------------------------------------
+# Documentation-generated output
+# --------------------------------------------------------------------
+
+docs/_build/
+docs/build/
+
+
+# --------------------------------------------------------------------
+# Editor and operating-system files
+# --------------------------------------------------------------------
+
+.vscode/
+.idea/
+.claude/
+
+*.swp
+*.swo
+*~
+*.bak
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.direnv
+.envrc

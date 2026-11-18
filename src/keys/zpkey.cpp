@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -31,12 +31,15 @@
 /// \author J. Ayo Akinyele
 ///
 
+#include <fstream>
+#include <iostream>
+#include <openabe/openabe.h>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
-#include <fstream>
 #include <string>
-#include <openabe/openabe.h>
 
 using namespace std;
 
@@ -57,64 +60,44 @@ OpenABEPKey::OpenABEPKey(bool isPrivate) : OpenABEKey() {
 /*!
  * Constructor for the OpenABEPKey class.
  *
+ * NOTE: In OpenSSL 4.0 the EC_KEY/EC_GROUP API has been removed.
+ *       This constructor now accepts an EVP_PKEY* directly.
+ *
+ * For a private key, the EVP_PKEY is duplicated as-is.
+ * For a public key, only the public portion is extracted via a PEM round-trip.
  */
-OpenABEPKey::OpenABEPKey(const EC_KEY *ec_key, bool isPrivate, EC_GROUP *group)
-    : OpenABEKey() {
-  EC_KEY *new_eckey = NULL;
-  EC_GROUP *new_group = NULL;
-  this->pkey = EVP_PKEY_new();
+OpenABEPKey::OpenABEPKey(EVP_PKEY* evp_key, bool isPrivate) : OpenABEKey() {
+  this->pkey = NULL;
   this->isPrivate = isPrivate;
-  string error_msg = "";
-  // check whether private or public key
+
+  ASSERT_NOTNULL(evp_key);
+
   if (this->isPrivate) {
-    // set as the EC_KEY (private key) of the pkey
-    // no need to copy since it'll be owned by the pkey
-    EVP_PKEY_assign_EC_KEY(this->pkey, ec_key);
+    // Duplicate the full key (private + public)
+    this->pkey = EVP_PKEY_dup(evp_key);
+    if (!this->pkey) {
+      throw OpenABE_ERROR_ELEMENT_NOT_INITIALIZED;
+    }
   } else {
-    ASSERT_NOTNULL(group);
-    // create a new EC_GROUP from the group of eckey, this
-    // will also copy over the ASN1 flag
-    new_group = EC_GROUP_dup(group);
-    if (!new_group) {
-      goto error;
+    // Extract only the public portion by serialising to PEM and reading back
+    // as a public key. This strips any private key material.
+    BIO* bio = BIO_new(BIO_s_mem());
+    if (!bio) {
+      throw OpenABE_ERROR_ELEMENT_NOT_INITIALIZED;
     }
 
-    new_eckey = EC_KEY_new();
-    if (!new_eckey) {
-      goto error;
+    if (!PEM_write_bio_PUBKEY(bio, evp_key)) {
+      BIO_free(bio);
+      throw OpenABE_ERROR_ELEMENT_NOT_INITIALIZED;
     }
 
-    if (EC_KEY_set_group(new_eckey, new_group) == 0) {
-      goto error;
-    }
+    this->pkey = PEM_read_bio_PUBKEY(bio, NULL, NULL, NULL);
+    BIO_free(bio);
 
-    // makes a copy of the public key
-    if (!EC_KEY_set_public_key(new_eckey, EC_KEY_get0_public_key(ec_key))) {
-      error_msg = "EC_KEY_set_public_key failed";
-      goto error;
-    }
-
-    // set the EC_KEY field of the EVP_PKEY
-    EVP_PKEY_assign_EC_KEY(this->pkey, new_eckey);
-    if (new_group != NULL) {
-      EC_GROUP_free(new_group);
+    if (!this->pkey) {
+      throw OpenABE_ERROR_ELEMENT_NOT_INITIALIZED;
     }
   }
-  return;
-error:
-  if (new_eckey != NULL) {
-    EC_KEY_free(new_eckey);
-  }
-
-  if (new_group != NULL) {
-    EC_GROUP_free(new_group);
-  }
-
-  if (error_msg != "") {
-    OpenABE_LOG(error_msg);
-  }
-
-  throw OpenABE_ERROR_ELEMENT_NOT_INITIALIZED;
 }
 
 /*!
@@ -127,11 +110,9 @@ OpenABEPKey::~OpenABEPKey() {
   }
 }
 
-
-OpenABE_ERROR
-OpenABEPKey::exportKeyToBytes(OpenABEByteString &output) {
+OpenABE_ERROR OpenABEPKey::exportKeyToBytes(OpenABEByteString& output) {
   OpenABE_ERROR result = OpenABE_ERROR_INVALID_INPUT;
-  BIO *pkey_out = nullptr;
+  BIO* pkey_out = nullptr;
   string pkey_text, s;
   stringstream ss;
 
@@ -144,8 +125,7 @@ OpenABEPKey::exportKeyToBytes(OpenABEByteString &output) {
 
   if (this->isPrivate) {
     // write private key
-    if (!PEM_write_bio_PKCS8PrivateKey(pkey_out, this->pkey, NULL, NULL, 0,
-                                       NULL, NULL)) {
+    if (!PEM_write_bio_PKCS8PrivateKey(pkey_out, this->pkey, NULL, NULL, 0, NULL, NULL)) {
       goto out;
     }
   } else {
@@ -173,14 +153,13 @@ out:
   return result;
 }
 
-OpenABE_ERROR
-OpenABEPKey::loadKeyFromBytes(OpenABEByteString &input) {
+OpenABE_ERROR OpenABEPKey::loadKeyFromBytes(OpenABEByteString& input) {
   OpenABE_ERROR result = OpenABE_NOERROR;
-  BIO *bio = NULL;
+  BIO* bio = NULL;
 
   // cout << "Serialized Key:\n" << input.toString() << endl;
 
-  bio = BIO_new_mem_buf((void *)input.getInternalPtr(), input.size());
+  bio = BIO_new_mem_buf((void*)input.getInternalPtr(), input.size());
   if (!bio) {
     result = OpenABE_ERROR_INVALID_INPUT;
     goto out;
@@ -211,22 +190,22 @@ out:
   return result;
 }
 
-bool OpenABEPKey::bioToString(string &s, BIO *bio) {
+bool OpenABEPKey::bioToString(string& s, BIO* bio) {
   bool result = false;
   char buf[512];
   int rc;
 
   s.clear();
   while ((rc = BIO_read(bio, buf, sizeof(buf))) > 0) {
-    char *end = buf;
+    char* end = buf;
     end += rc;
     s.append(buf, end);
   }
 
-  if (BIO_eof(bio)) {
+  if ((int)BIO_ctrl(bio, BIO_CTRL_EOF, 0, NULL)) {
     result = true;
   }
   return result;
 }
 
-}
+} // namespace oabe

@@ -2,14 +2,14 @@ include ../Makefile.common
 
 .PHONY: all clean
 
-DIRS=$(DEPS_PACKAGES)
+DIRS = $(DEPS_PACKAGES)
 # relic openssl gtest
 all: $(DIRS)
 	mkdir -p root/lib
 	mkdir -p root/bin
 ifndef NO_DEPS
 	for d in $(DIRS); do \
-		make -C $$d; \
+		make -C $$d || exit 1; \
 	done
 endif
 

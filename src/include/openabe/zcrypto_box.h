@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -48,23 +48,19 @@ public:
   virtual void enableKeyManager(const std::string userId) = 0;
 
   // for CP/KP-ABE
-  virtual void exportPublicParams(std::string &mpk) = 0;
-  virtual void exportSecretParams(std::string &msk) = 0;
-  virtual void importPublicParams(const std::string &keyBlob) = 0;
-  virtual void importSecretParams(const std::string &keyBlob) = 0;
+  virtual void exportPublicParams(std::string& mpk) = 0;
+  virtual void exportSecretParams(std::string& msk) = 0;
+  virtual void importPublicParams(const std::string& keyBlob) = 0;
+  virtual void importSecretParams(const std::string& keyBlob) = 0;
 
   // for multi-authority (allow import per authID)
-  virtual void importPublicParams(const std::string &authID,
-                        const std::string &keyBlob) = 0;
+  virtual void importPublicParams(const std::string& authID, const std::string& keyBlob) = 0;
 
-  virtual void importSecretParams(const std::string &authID,
-                        const std::string &keyBlob) = 0;
-  virtual void importUserKey(const std::string &keyID,
-                             const std::string &keyBlob) = 0;
+  virtual void importSecretParams(const std::string& authID, const std::string& keyBlob) = 0;
+  virtual void importUserKey(const std::string& keyID, const std::string& keyBlob) = 0;
 
-  virtual void exportUserKey(const std::string &keyID,
-                             std::string &keyBlob) = 0;
-  virtual bool deleteKey(const std::string &keyID) = 0;
+  virtual void exportUserKey(const std::string& keyID, std::string& keyBlob) = 0;
+  virtual bool deleteKey(const std::string& keyID) = 0;
 };
 
 /*!
@@ -90,32 +86,28 @@ public:
   void enableVerbose();
 
   // import/export various params and keys (for multi-authority)
-  void exportGlobalParams(std::string &globlmpk);
-  void importGlobalParams(const std::string &keyBlob);
+  void exportGlobalParams(std::string& globlmpk);
+  void importGlobalParams(const std::string& keyBlob);
 
   // for CP/KP-ABE
-  void exportPublicParams(std::string &mpk);
-  void exportSecretParams(std::string &msk);
-  void importPublicParams(const std::string &keyBlob);
-  void importSecretParams(const std::string &keyBlob);
+  void exportPublicParams(std::string& mpk);
+  void exportSecretParams(std::string& msk);
+  void importPublicParams(const std::string& keyBlob);
+  void importSecretParams(const std::string& keyBlob);
 
   // for multi-authority (allow import per authID)
-  void importPublicParams(const std::string &authID,
-                          const std::string &keyBlob);
+  void importPublicParams(const std::string& authID, const std::string& keyBlob);
 
-  void importSecretParams(const std::string &authID,
-                          const std::string &keyBlob);
-  void importUserKey(const std::string &keyID, const std::string &keyBlob);
-  void exportUserKey(const std::string &keyID, std::string &keyBlob);
-  bool deleteKey(const std::string &keyID);
+  void importSecretParams(const std::string& authID, const std::string& keyBlob);
+  void importUserKey(const std::string& keyID, const std::string& keyBlob);
+  void exportUserKey(const std::string& keyID, std::string& keyBlob);
+  bool deleteKey(const std::string& keyID);
 
-  void keygen(const std::string &keyInput, const std::string &keyID,
-              const std::string &authID = "", const std::string &GID = "");
-  void encrypt(const std::string encInput, const std::string &plaintext,
-               std::string &ciphertext);
-  bool decrypt(const std::string &keyID, const std::string &ciphertext,
-               std::string &plaintext);
-  bool decrypt(const std::string &ciphertext, std::string &plaintext);
+  void keygen(const std::string& keyInput, const std::string& keyID, const std::string& authID = "",
+              const std::string& GID = "");
+  void encrypt(const std::string encInput, const std::string& plaintext, std::string& ciphertext);
+  bool decrypt(const std::string& keyID, const std::string& ciphertext, std::string& plaintext);
+  bool decrypt(const std::string& ciphertext, std::string& plaintext);
 
 private:
   std::string userId_;
@@ -142,17 +134,17 @@ public:
   OpenPKEContext(const std::string ec_id = "NIST_P256", bool base64encode = true);
   virtual ~OpenPKEContext() {};
 
-  void exportPublicKey(const std::string key_id, std::string &keyBlob);
-  void exportPrivateKey(const std::string key_id, std::string &keyBlob);
+  void exportPublicKey(const std::string key_id, std::string& keyBlob);
+  void exportPrivateKey(const std::string key_id, std::string& keyBlob);
 
-  void importPublicKey(const std::string key_id, const std::string &keyBlob);
-  void importPrivateKey(const std::string key_id, const std::string &keyBlob);
+  void importPublicKey(const std::string key_id, const std::string& keyBlob);
+  void importPrivateKey(const std::string key_id, const std::string& keyBlob);
 
   void keygen(const std::string key_id);
-  bool encrypt(const std::string receiver_id, const std::string &plaintext,
-               std::string &ciphertext);
-  bool decrypt(const std::string receiver_id, const std::string &ciphertext,
-               std::string &plaintext);
+  bool encrypt(const std::string receiver_id, const std::string& plaintext,
+               std::string& ciphertext);
+  bool decrypt(const std::string receiver_id, const std::string& ciphertext,
+               std::string& plaintext);
 
 private:
   std::unique_ptr<OpenABEContextSchemePKE> schemeContext_;
@@ -174,17 +166,15 @@ public:
   OpenPKSIGContext(const std::string ec_id = "NIST_P256", bool base64encode = true);
   virtual ~OpenPKSIGContext() {};
 
-  void exportPublicKey(const std::string key_id, std::string &keyBlob);
-  void exportPrivateKey(const std::string key_id, std::string &keyBlob);
+  void exportPublicKey(const std::string key_id, std::string& keyBlob);
+  void exportPrivateKey(const std::string key_id, std::string& keyBlob);
 
-  void importPublicKey(const std::string key_id, const std::string &keyBlob);
-  void importPrivateKey(const std::string key_id, const std::string &keyBlob);
+  void importPublicKey(const std::string key_id, const std::string& keyBlob);
+  void importPrivateKey(const std::string key_id, const std::string& keyBlob);
 
   void keygen(const std::string key_id);
-  void sign(const std::string key_id, const std::string &message,
-            std::string &signature);
-  bool verify(const std::string key_id, const std::string &message,
-              const std::string &signature);
+  void sign(const std::string key_id, const std::string& message, std::string& signature);
+  bool verify(const std::string key_id, const std::string& message, const std::string& signature);
 
 private:
   std::unique_ptr<OpenABEContextSchemePKSIG> schemeContext_;
@@ -192,11 +182,10 @@ private:
   bool base64Encode_;
 };
 
-
 // helper methods to help with using the keystore
-//std::pair<std::string,std::string> SearchKeyStore(OpenABEKeystoreManager& key_manager, std::string& id, std::string& ciphertext);
+// std::pair<std::string,std::string> SearchKeyStore(OpenABEKeystoreManager& key_manager,
+// std::string& id, std::string& ciphertext);
 
-}
+} // namespace oabe
 
 #endif // __ZCRYPTO_BOX__
-

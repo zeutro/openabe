@@ -42,7 +42,15 @@ function get_os_family() {
 
 export ZROOT
 export DEPS_INSTALL_ZROOT
-export LD_LIBRARY_PATH=${DEPS_INSTALL_ZROOT}/lib:${OABE_LIBS_ROOT}/lib:${LD_LIBRARY_PATH}
+# lab64 is used on x84_64 Linux as OpenSSL puts it there instead of lib
+export LD_LIBRARY_PATH=${DEPS_INSTALL_ZROOT}/lib:${DEPS_INSTALL_ZROOT}/lib64:${OABE_LIBS_ROOT}/lib:${LD_LIBRARY_PATH}
+
+# On Windows (MSYS2/MinGW64) DLLs are resolved via PATH, not LD_LIBRARY_PATH
+case "`uname -s`" in
+  MINGW*|MSYS*)
+    export PATH=${DEPS_INSTALL_ZROOT}/bin:${DEPS_INSTALL_ZROOT}/lib:${OABE_LIBS_ROOT}/lib:${PATH}
+    ;;
+esac
 
 OS_NAME=`uname -s`
 if [[ $OS_NAME == "Linux" ]]; then
@@ -56,4 +64,5 @@ elif [[ $OS_NAME == "MINGW64_NT-10.0" ]]; then
 else
    export OS_FAMILY=`uname -s | tr '[:upper:]' '[:lower:]'`
 fi
+   export BISON=/usr/bin/bison
 

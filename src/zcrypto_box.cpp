@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -31,13 +31,13 @@
 /// \author     J. Ayo Akinyele
 ///
 
-#include <sstream>
-#include <stdexcept>
 #include <cassert>
 #include <openabe/openabe.h>
+#include <sstream>
+#include <stdexcept>
 
-#include <openssl/pem.h>
 #include <openssl/evp.h>
+#include <openssl/pem.h>
 
 using namespace std;
 
@@ -79,21 +79,20 @@ OpenABECryptoContext::OpenABECryptoContext(const std::string scheme_id, bool bas
 }
 
 void OpenABECryptoContext::generateParams() {
-    schemeContextCCA_->generateParams(DEFAULT_BP_PARAM, MASTER_PUBLIC_PARAMS,
-                                      MASTER_SECRET_PARAMS);
+  schemeContextCCA_->generateParams(DEFAULT_BP_PARAM, MASTER_PUBLIC_PARAMS, MASTER_SECRET_PARAMS);
 }
 
 void OpenABECryptoContext::enableKeyManager(const std::string userId) {
-    userId_ = userId;
-    useKeyManager_ = true;
+  userId_ = userId;
+  useKeyManager_ = true;
 }
 
 void OpenABECryptoContext::enableVerbose() {
-    debug_ = true;
+  debug_ = true;
 }
 
-void OpenABECryptoContext::keygen(const std::string &keyInput, const std::string &keyID,
-                                  const std::string &authID, const std::string &GID) {
+void OpenABECryptoContext::keygen(const std::string& keyInput, const std::string& keyID,
+                                  const std::string& authID, const std::string& GID) {
   unique_ptr<OpenABEFunctionInput> keyFuncInput = nullptr;
   if (keyInputType_ == FUNC_POLICY_INPUT) {
     keyFuncInput = createPolicyTree(keyInput);
@@ -103,8 +102,8 @@ void OpenABECryptoContext::keygen(const std::string &keyInput, const std::string
 
   string mpkID = MASTER_PUBLIC_PARAMS, mskID = MASTER_SECRET_PARAMS, gpkID = "";
   if (keyFuncInput != nullptr) {
-    OpenABE_ERROR result = schemeContextCCA_->keygen(keyFuncInput.get(), keyID,
-                                                 mpkID, mskID, gpkID, GID);
+    OpenABE_ERROR result =
+        schemeContextCCA_->keygen(keyFuncInput.get(), keyID, mpkID, mskID, gpkID, GID);
     if (result != OpenABE_NOERROR) {
       throw ZCryptoBoxException(OpenABE_errorToString(result));
     }
@@ -113,33 +112,32 @@ void OpenABECryptoContext::keygen(const std::string &keyInput, const std::string
   }
 }
 
-void OpenABECryptoContext::exportPublicParams(string &mpk) {
+void OpenABECryptoContext::exportPublicParams(string& mpk) {
   return exportUserKey(MASTER_PUBLIC_PARAMS, mpk);
 }
 
-void OpenABECryptoContext::exportSecretParams(string &msk) {
+void OpenABECryptoContext::exportSecretParams(string& msk) {
   return exportUserKey(MASTER_SECRET_PARAMS, msk);
 }
 
-void OpenABECryptoContext::exportUserKey(const string &keyID, string &keyBlob) {
+void OpenABECryptoContext::exportUserKey(const string& keyID, string& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEByteString key;
-  if ((result = this->schemeContextCCA_->exportKey(keyID, key)) !=
-      OpenABE_NOERROR) {
+  if ((result = this->schemeContextCCA_->exportKey(keyID, key)) != OpenABE_NOERROR) {
     throw ZCryptoBoxException(OpenABE_errorToString(result));
   }
 
   keyBlob = key.toString();
   if (base64Encode_)
-    keyBlob = Base64Encode((const uint8_t *)keyBlob.c_str(), keyBlob.size());
+    keyBlob = Base64Encode((const uint8_t*)keyBlob.c_str(), keyBlob.size());
 }
 
-void OpenABECryptoContext::importPublicParams(const std::string &keyBlob) {
+void OpenABECryptoContext::importPublicParams(const std::string& keyBlob) {
   importPublicParams(MASTER_PUBLIC_PARAMS, keyBlob);
 }
 
-void OpenABECryptoContext::importPublicParams(const std::string &authID,
-                                    const std::string &keyBlob) {
+void OpenABECryptoContext::importPublicParams(const std::string& authID,
+                                              const std::string& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEByteString key;
   if (base64Encode_)
@@ -154,12 +152,12 @@ void OpenABECryptoContext::importPublicParams(const std::string &authID,
   }
 }
 
-void OpenABECryptoContext::importSecretParams(const std::string &keyBlob) {
+void OpenABECryptoContext::importSecretParams(const std::string& keyBlob) {
   this->importSecretParams(MASTER_SECRET_PARAMS, keyBlob);
 }
 
-void OpenABECryptoContext::importSecretParams(const std::string &authID,
-                                    const std::string &keyBlob) {
+void OpenABECryptoContext::importSecretParams(const std::string& authID,
+                                              const std::string& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEByteString key;
   if (base64Encode_)
@@ -185,22 +183,21 @@ void OpenABECryptoContext::importUserKey(const std::string& keyID, const std::st
     key += keyBlob;
 
   if (!useKeyManager_)
-      result = schemeContextCCA_->loadUserSecretParams(keyID, key);
+    result = schemeContextCCA_->loadUserSecretParams(keyID, key);
   else
-      keyManager_->storeWithKeyIDCommand(userId_, keyID, key, 0);
+    keyManager_->storeWithKeyIDCommand(userId_, keyID, key, 0);
 
   if (result != OpenABE_NOERROR) {
     throw ZCryptoBoxException(OpenABE_errorToString(result));
   }
 }
 
-bool OpenABECryptoContext::deleteKey(const std::string &keyID) {
+bool OpenABECryptoContext::deleteKey(const std::string& keyID) {
   return (this->schemeContextCCA_->deleteKey(keyID) == OpenABE_NOERROR);
 }
 
-void OpenABECryptoContext::encrypt(const std::string encInput,
-                         const std::string &plaintext,
-                         std::string &ciphertext) {
+void OpenABECryptoContext::encrypt(const std::string encInput, const std::string& plaintext,
+                                   std::string& ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   unique_ptr<OpenABECiphertext> ciphertext1 = nullptr, ciphertext2 = nullptr;
   unique_ptr<OpenABEFunctionInput> funcInput = nullptr;
@@ -223,9 +220,8 @@ void OpenABECryptoContext::encrypt(const std::string encInput,
 
     string mpkID = MASTER_PUBLIC_PARAMS;
     // now we can encrypt
-    if ((result = schemeContextCCA_->encrypt(
-             mpkID, funcInput.get(), plaintext, ciphertext1.get(),
-             ciphertext2.get())) != OpenABE_NOERROR) {
+    if ((result = schemeContextCCA_->encrypt(mpkID, funcInput.get(), plaintext, ciphertext1.get(),
+                                             ciphertext2.get())) != OpenABE_NOERROR) {
       throw ZCryptoBoxException(OpenABE_errorToString(result));
     }
 
@@ -238,20 +234,19 @@ void OpenABECryptoContext::encrypt(const std::string encInput,
     combined.pack(ct2);
     if (base64Encode_) {
       const string ct = combined.toString();
-      ciphertext = Base64Encode((const uint8_t *)ct.data(), ct.size());
+      ciphertext = Base64Encode((const uint8_t*)ct.data(), ct.size());
     } else {
       ciphertext = combined.toString();
     }
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     if (debug_)
       cerr << "OpenABECryptoContext::encrypt: " << OpenABE_errorToString(error) << endl;
     throw ZCryptoBoxException(OpenABE_errorToString(error));
   }
 }
 
-bool OpenABECryptoContext::decrypt(const std::string &keyID,
-                         const std::string &ciphertext,
-                         std::string &plaintext) {
+bool OpenABECryptoContext::decrypt(const std::string& keyID, const std::string& ciphertext,
+                                   std::string& plaintext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   unique_ptr<OpenABECiphertext> ciphertext1 = nullptr, ciphertext2 = nullptr;
 
@@ -277,21 +272,19 @@ bool OpenABECryptoContext::decrypt(const std::string &keyID,
 
     string mpkID = MASTER_PUBLIC_PARAMS;
     // can now decrypt
-    if ((result = schemeContextCCA_->decrypt(
-             mpkID, keyID, plaintext, ciphertext1.get(), ciphertext2.get())) !=
-        OpenABE_NOERROR) {
+    if ((result = schemeContextCCA_->decrypt(mpkID, keyID, plaintext, ciphertext1.get(),
+                                             ciphertext2.get())) != OpenABE_NOERROR) {
       throw result;
     }
     return true;
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     if (debug_)
       cerr << "OpenABECryptoContext::decrypt: " << OpenABE_errorToString(error) << endl;
   }
   return false;
 }
 
-bool OpenABECryptoContext::decrypt(const std::string &ciphertext,
-                                   std::string &plaintext) {
+bool OpenABECryptoContext::decrypt(const std::string& ciphertext, std::string& plaintext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEKeyQuery query;
   unique_ptr<OpenABECiphertext> ciphertext1 = nullptr, ciphertext2 = nullptr;
@@ -327,24 +320,26 @@ bool OpenABECryptoContext::decrypt(const std::string &ciphertext,
     unique_ptr<OpenABEFunctionInput> funcInput = getFunctionInput(ciphertext1.get());
     const string decKeyId = keyManager_->searchKeyCommand(&query, funcInput.get());
     if (decKeyId == "") {
-        throw ZCryptoBoxException("Key Manager could not find an appropriate key to decrypt!");
+      throw ZCryptoBoxException("Key Manager could not find an appropriate key to decrypt!");
     }
 
     // load key in the scheme context
-    pair<string,OpenABEByteString> sk = keyManager_->getKeyCommand(userId_, decKeyId);
-    if (debug_) { cout << "Found Key: '" << decKeyId << "' => '" << sk.first << "'" << endl; }
-    if ((result = schemeContextCCA_->loadUserSecretParams(decKeyId, sk.second)) != OpenABE_NOERROR) {
-        throw result;
+    pair<string, OpenABEByteString> sk = keyManager_->getKeyCommand(userId_, decKeyId);
+    if (debug_) {
+      cout << "Found Key: '" << decKeyId << "' => '" << sk.first << "'" << endl;
     }
-
-    // can now decrypt
-    if ((result = schemeContextCCA_->decrypt(
-             mpkID, decKeyId, plaintext, ciphertext1.get(), ciphertext2.get())) !=
+    if ((result = schemeContextCCA_->loadUserSecretParams(decKeyId, sk.second)) !=
         OpenABE_NOERROR) {
       throw result;
     }
+
+    // can now decrypt
+    if ((result = schemeContextCCA_->decrypt(mpkID, decKeyId, plaintext, ciphertext1.get(),
+                                             ciphertext2.get())) != OpenABE_NOERROR) {
+      throw result;
+    }
     return true;
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     if (debug_)
       cerr << "OpenABECryptoContext::decrypt: " << OpenABE_errorToString(error) << endl;
   }
@@ -375,8 +370,7 @@ void OpenPKEContext::keygen(const string key_id) {
   }
 }
 
-void OpenPKEContext::exportPublicKey(const std::string key_id,
-                                 std::string &keyBlob) {
+void OpenPKEContext::exportPublicKey(const std::string key_id, std::string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString public_key;
   const string pk_id = OpenABE_PK_PREFIX(key_id);
@@ -386,13 +380,12 @@ void OpenPKEContext::exportPublicKey(const std::string key_id,
 
   if (base64Encode_) {
     const string str = public_key.toString();
-    keyBlob = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    keyBlob = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     keyBlob = public_key.toString();
 }
 
-void OpenPKEContext::exportPrivateKey(const std::string key_id,
-                                  std::string &keyBlob) {
+void OpenPKEContext::exportPrivateKey(const std::string key_id, std::string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString private_key;
   const string sk_id = OpenABE_SK_PREFIX(key_id);
@@ -402,12 +395,12 @@ void OpenPKEContext::exportPrivateKey(const std::string key_id,
 
   if (base64Encode_) {
     const string str = private_key.toString();
-    keyBlob = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    keyBlob = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     keyBlob = private_key.toString();
 }
 
-void OpenPKEContext::importPublicKey(const string key_id, const string &keyBlob) {
+void OpenPKEContext::importPublicKey(const string key_id, const string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString key_buf;
   const string pk_id = OpenABE_PK_PREFIX(key_id);
@@ -421,7 +414,7 @@ void OpenPKEContext::importPublicKey(const string key_id, const string &keyBlob)
   }
 }
 
-void OpenPKEContext::importPrivateKey(const string key_id, const string &keyBlob) {
+void OpenPKEContext::importPrivateKey(const string key_id, const string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString key_buf;
   const string sk_id = OpenABE_SK_PREFIX(key_id);
@@ -430,35 +423,34 @@ void OpenPKEContext::importPrivateKey(const string key_id, const string &keyBlob
   else
     key_buf = keyBlob;
 
-  if ((result = schemeContext_->loadPrivateKey(sk_id, key_buf)) !=
-      OpenABE_NOERROR) {
+  if ((result = schemeContext_->loadPrivateKey(sk_id, key_buf)) != OpenABE_NOERROR) {
     throw ZCryptoBoxException("importPrivateKey: " + string(OpenABE_errorToString(result)));
   }
 }
 
-bool OpenPKEContext::encrypt(const string receiver_id, const string &plaintext,
-                         string &ciphertext) {
+bool OpenPKEContext::encrypt(const string receiver_id, const string& plaintext,
+                             string& ciphertext) {
   OpenABE_ERROR result;
   OpenABECiphertext ct;
   OpenABEByteString ct_buf;
 
   if ((result = schemeContext_->encrypt(nullptr, OpenABE_PK_PREFIX(receiver_id),
-                                        OpenABE_PK_PREFIX(receiver_id), plaintext,
-                                        &ct)) != OpenABE_NOERROR) {
+                                        OpenABE_PK_PREFIX(receiver_id), plaintext, &ct)) !=
+      OpenABE_NOERROR) {
     throw ZCryptoBoxException("encrypt: " + string(OpenABE_errorToString(result)));
   }
   ct.exportToBytes(ct_buf);
   if (base64Encode_) {
     const string str = ct_buf.toString();
-    ciphertext = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    ciphertext = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     ciphertext = ct_buf.toString();
 
   return true;
 }
 
-bool OpenPKEContext::decrypt(const string receiver_id, const string &ciphertext,
-                         string &plaintext) {
+bool OpenPKEContext::decrypt(const string receiver_id, const string& ciphertext,
+                             string& plaintext) {
   OpenABE_ERROR result;
   OpenABEByteString ct_buf;
   OpenABECiphertext ct;
@@ -470,8 +462,8 @@ bool OpenPKEContext::decrypt(const string receiver_id, const string &ciphertext,
   ct.loadFromBytes(ct_buf);
 
   if ((result = schemeContext_->decrypt(OpenABE_PK_PREFIX(receiver_id),
-                                        OpenABE_SK_PREFIX(receiver_id), plaintext,
-                                        &ct)) != OpenABE_NOERROR) {
+                                        OpenABE_SK_PREFIX(receiver_id), plaintext, &ct)) !=
+      OpenABE_NOERROR) {
     return false;
   }
   return true;
@@ -499,8 +491,7 @@ void OpenPKSIGContext::keygen(const string key_id) {
   }
 }
 
-void OpenPKSIGContext::exportPublicKey(const std::string key_id,
-                                   std::string &keyBlob) {
+void OpenPKSIGContext::exportPublicKey(const std::string key_id, std::string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString public_key;
   const string pk_id = OpenABE_PK_PREFIX(key_id);
@@ -510,13 +501,12 @@ void OpenPKSIGContext::exportPublicKey(const std::string key_id,
 
   if (base64Encode_) {
     const string str = public_key.toString();
-    keyBlob = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    keyBlob = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     keyBlob = public_key.toString();
 }
 
-void OpenPKSIGContext::exportPrivateKey(const std::string key_id,
-                                    std::string &keyBlob) {
+void OpenPKSIGContext::exportPrivateKey(const std::string key_id, std::string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString private_key;
   const string sk_id = OpenABE_SK_PREFIX(key_id);
@@ -526,12 +516,12 @@ void OpenPKSIGContext::exportPrivateKey(const std::string key_id,
 
   if (base64Encode_) {
     const string str = private_key.toString();
-    keyBlob = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    keyBlob = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     keyBlob = private_key.toString();
 }
 
-void OpenPKSIGContext::importPublicKey(const string key_id, const string &keyBlob) {
+void OpenPKSIGContext::importPublicKey(const string key_id, const string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString key_buf;
   const string pk_id = OpenABE_PK_PREFIX(key_id);
@@ -545,8 +535,7 @@ void OpenPKSIGContext::importPublicKey(const string key_id, const string &keyBlo
   }
 }
 
-void OpenPKSIGContext::importPrivateKey(const string key_id,
-                                    const string &keyBlob) {
+void OpenPKSIGContext::importPrivateKey(const string key_id, const string& keyBlob) {
   OpenABE_ERROR result;
   OpenABEByteString key_buf;
   const string sk_id = OpenABE_SK_PREFIX(key_id);
@@ -555,14 +544,13 @@ void OpenPKSIGContext::importPrivateKey(const string key_id,
   else
     key_buf = keyBlob;
 
-  if ((result = schemeContext_->loadPrivateKey(sk_id, key_buf)) !=
-      OpenABE_NOERROR) {
+  if ((result = schemeContext_->loadPrivateKey(sk_id, key_buf)) != OpenABE_NOERROR) {
     throw ZCryptoBoxException("importPrivateKey: " + string(OpenABE_errorToString(result)));
   }
 }
 
-void OpenPKSIGContext::sign(const std::string key_id, const std::string &message,
-                        std::string &signature) {
+void OpenPKSIGContext::sign(const std::string key_id, const std::string& message,
+                            std::string& signature) {
   OpenABE_ERROR result;
   OpenABEByteString msg, sig;
   const string sk_id = OpenABE_SK_PREFIX(key_id);
@@ -573,13 +561,13 @@ void OpenPKSIGContext::sign(const std::string key_id, const std::string &message
 
   if (base64Encode_) {
     const string str = sig.toString();
-    signature = Base64Encode((const uint8_t *)str.c_str(), str.size());
+    signature = Base64Encode((const uint8_t*)str.c_str(), str.size());
   } else
     signature = sig.toString();
 }
 
-bool OpenPKSIGContext::verify(const std::string key_id, const std::string &message,
-                          const std::string &signature) {
+bool OpenPKSIGContext::verify(const std::string key_id, const std::string& message,
+                              const std::string& signature) {
   OpenABE_ERROR result;
   OpenABEByteString msg, sig;
   if (base64Encode_)
@@ -596,4 +584,4 @@ bool OpenPKSIGContext::verify(const std::string key_id, const std::string &messa
   return true;
 }
 
-}
+} // namespace oabe

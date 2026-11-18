@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -33,6 +33,8 @@
 
 #ifndef __ZELEMENT_BP_H__
 #define __ZELEMENT_BP_H__
+
+#include <cstdint>
 
 #if defined(BP_WITH_OPENSSL)
 #define BN_WITH_OPENSSL
@@ -52,8 +54,8 @@ void fp12_write_ostream(std::ostream& os, fp12_t a, int radix);
 void fp6_write_ostream(std::ostream& os, fp6_t a, int radix);
 void fp2_write_ostream(std::ostream& os, fp2_t a, int radix);
 void fp_write_ostream(std::ostream& os, fp_t a, int radix);
-void ep2_write_ostream(std::ostream &os, ep2_t p, int radix);
-void ep_write_ostream(std::ostream &os, ep_t p, int radix);
+void ep2_write_ostream(std::ostream& os, ep2_t p, int radix);
+void ep_write_ostream(std::ostream& os, ep_t p, int radix);
 #endif
 
 #ifndef __ZPAIRING_H__
@@ -67,21 +69,22 @@ class OpenABERNG;
 bool checkRelicError();
 #endif
 
-}
+} // namespace oabe
 
 void ro_error(void);
 
 void g1_map_op(const bp_group_t group, g1_ptr g, oabe::OpenABEByteString& msg);
 const std::string g1_point_to_string(bp_group_t group, const g1_ptr p);
-void g1_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString & s, const g1_ptr p);
+void g1_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString& s, const g1_ptr p);
 void g1_convert_to_point(bp_group_t group, oabe::OpenABEByteString& s, g1_ptr p);
 
 void g2_convert_to_point(bp_group_t group, oabe::OpenABEByteString& s, g2_ptr p);
 const std::string g2_point_to_string(bp_group_t group, const g2_ptr p);
-void g2_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString & s, g2_ptr p);
+void g2_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString& s, g2_ptr p);
 
 void gt_convert_to_point(bp_group_t group, oabe::OpenABEByteString& s, gt_ptr p);
-void gt_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString& s, gt_ptr p, int should_compress);
+void gt_convert_to_bytestring(bp_group_t group, oabe::OpenABEByteString& s, gt_ptr p,
+                              int should_compress);
 const std::string gt_point_to_string(const bp_group_t group, gt_ptr p);
 
 /// \class	ZP
@@ -90,21 +93,20 @@ const std::string gt_point_to_string(const bp_group_t group, gt_ptr p);
 namespace oabe {
 
 // retrieve the group field of the BPGroup class
-#define GET_BP_GROUP(g)    g->group
+#define GET_BP_GROUP(g) g->group
 
 /// \class  ECGroup
 /// \brief  Wrapper for managing elliptic curve groups
 class BPGroup : public ZGroup {
 public:
-  bp_group_t   group;
-  bignum_t     order;
+  bp_group_t group;
+  bignum_t order;
 
   BPGroup(OpenABECurveID id);
   ~BPGroup();
 
   void getGroupOrder(bignum_t o);
 };
-
 
 /// \class  ZP
 /// \brief  Class for ZP elements in ZML.
@@ -127,9 +129,9 @@ public:
 
   std::string getBytesAsString();
   OpenABEByteString getByteString() const;
-  void getLengthAndByteString(OpenABEByteString &z) const;
+  void getLengthAndByteString(OpenABEByteString& z) const;
   void setOrder(const bignum_t o);
-  void setRandom(OpenABERNG *rng, bignum_t o);
+  void setRandom(OpenABERNG* rng, bignum_t o);
 
   void setFrom(ZP&, uint32_t);
   bool ismember();
@@ -138,10 +140,10 @@ public:
   friend ZP power(const ZP&, unsigned int);
   friend ZP power(const ZP&, const ZP&);
   friend ZP operator-(const ZP&);
-  friend ZP operator-(const ZP&,const ZP&);
-  friend ZP operator+(const ZP&,const ZP&);
-  friend ZP operator*(const ZP&,const ZP&);
-  friend ZP operator/(const ZP&,const ZP&);
+  friend ZP operator-(const ZP&, const ZP&);
+  friend ZP operator+(const ZP&, const ZP&);
+  friend ZP operator*(const ZP&, const ZP&);
+  friend ZP operator/(const ZP&, const ZP&);
   friend ZP operator<<(const ZP&, int);
   friend ZP operator>>(const ZP&, int);
 
@@ -153,9 +155,11 @@ public:
   friend bool operator==(const ZP& x, const ZP& y);
   friend bool operator!=(const ZP& x, const ZP& y);
 
-  ZP*    clone() const { return new ZP(*this); }
-  void serialize(OpenABEByteString &result) const;
-  void deserialize(OpenABEByteString &input);
+  ZP* clone() const {
+    return new ZP(*this);
+  }
+  void serialize(OpenABEByteString& result) const;
+  void deserialize(OpenABEByteString& input);
   bool isEqual(ZObject*) const;
 };
 
@@ -173,20 +177,22 @@ public:
   G1& operator*=(const G1& x);
   G1& operator=(const G1& w);
 
-  void setRandom(OpenABERNG *rng);
+  void setRandom(OpenABERNG* rng);
   bool ismember(bignum_t);
   G1 exp(ZP);
   void multInverse();
   friend G1 operator-(const G1&);
-  friend G1 operator/(const G1&,const G1&);
-  friend G1 operator*(const G1&,const G1&);
+  friend G1 operator/(const G1&, const G1&);
+  friend G1 operator*(const G1&, const G1&);
   friend std::ostream& operator<<(std::ostream&, const G1&);
   friend bool operator==(const G1& x, const G1& y);
-  friend bool operator!=(const G1& x,const G1& y);
+  friend bool operator!=(const G1& x, const G1& y);
 
-  G1*    clone() const { return new G1(*this); }
-  void serialize(OpenABEByteString &result) const;
-  void deserialize(OpenABEByteString &input);
+  G1* clone() const {
+    return new G1(*this);
+  }
+  void serialize(OpenABEByteString& result) const;
+  void deserialize(OpenABEByteString& input);
   bool isEqual(ZObject*) const;
 };
 
@@ -204,20 +210,22 @@ public:
   G2& operator*=(const G2& x);
   G2& operator=(const G2& w);
 
-  void setRandom(OpenABERNG *rng);
+  void setRandom(OpenABERNG* rng);
   bool ismember(bignum_t);
   G2 exp(ZP);
 
   friend G2 operator-(const G2&);
-  friend G2 operator/(const G2&,const G2&);
-  friend G2 operator*(const G2&,const G2&);
+  friend G2 operator/(const G2&, const G2&);
+  friend G2 operator*(const G2&, const G2&);
   friend std::ostream& operator<<(std::ostream&, const G2&);
-  friend bool operator==(const G2& x,const G2& y);
-  friend bool operator!=(const G2& x,const G2& y);
+  friend bool operator==(const G2& x, const G2& y);
+  friend bool operator!=(const G2& x, const G2& y);
 
-  G2*    clone() const { return new G2(*this); }
-  void serialize(OpenABEByteString &result) const;
-  void deserialize(OpenABEByteString &input);
+  G2* clone() const {
+    return new G2(*this);
+  }
+  void serialize(OpenABEByteString& result) const;
+  void deserialize(OpenABEByteString& input);
   bool isEqual(ZObject*) const;
 };
 
@@ -235,24 +243,30 @@ public:
   GT& operator*=(const GT& x);
   GT& operator=(const GT& x);
 
-  void enableCompression() { shouldCompress_ = true; };
-  void disableCompression() { shouldCompress_ = false; };
-  //void setRandom(OpenABERNG *rng);
+  void enableCompression() {
+    shouldCompress_ = true;
+  };
+  void disableCompression() {
+    shouldCompress_ = false;
+  };
+  // void setRandom(OpenABERNG *rng);
   void setIdentity();
   bool isInfinity();
   bool ismember(bignum_t);
   GT exp(ZP);
 
   friend GT operator-(const GT&);
-  friend GT operator/(const GT&,const GT&);
-  friend GT operator*(const GT&,const GT&);
+  friend GT operator/(const GT&, const GT&);
+  friend GT operator*(const GT&, const GT&);
   friend std::ostream& operator<<(std::ostream& s, const GT&);
   friend bool operator==(const GT& x, const GT& y);
   friend bool operator!=(const GT& x, const GT& y);
 
-  GT* clone() const { return new GT(*this); }
-  void serialize(OpenABEByteString &result) const;
-  void deserialize(OpenABEByteString &input);
+  GT* clone() const {
+    return new GT(*this);
+  }
+  void serialize(OpenABEByteString& result) const;
+  void deserialize(OpenABEByteString& input);
   bool isEqual(ZObject*) const;
 
 private:
@@ -267,10 +281,10 @@ typedef std::vector<ZP> OpenABEElementList;
 /// \brief      Iterator for an OpenABEElementList of rows in an LSSS
 typedef OpenABEElementList::iterator OpenABEElementListIterator;
 
-}
+} // namespace oabe
 
 // pairings definition
-void multi_bp_map_op(const bp_group_t group, oabe::GT& gt,
-                     std::vector<oabe::G1>& g1, std::vector<oabe::G2>& g2);
+void multi_bp_map_op(const bp_group_t group, oabe::GT& gt, std::vector<oabe::G1>& g1,
+                     std::vector<oabe::G2>& g2);
 
-#endif	// __ZELEMENT_BP_H__
+#endif // __ZELEMENT_BP_H__

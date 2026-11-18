@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -39,27 +39,25 @@
 
 #define SAFE_MALLOC(size) malloc(size)
 #define SAFE_FREE(val) free(val)
-#define SAFE_DELETE(ref)                                                       \
-  if (ref != NULL) {                                                           \
-    delete ref;                                                                \
-    ref = NULL;                                                                \
+#define SAFE_DELETE(ref)                                                                           \
+  if (ref != NULL) {                                                                               \
+    delete ref;                                                                                    \
+    ref = NULL;                                                                                    \
   }
 
 #define OpenABE_LOG_ERROR(str) (std::cerr << "ERROR: " << str << std::endl)
 
 #ifdef DEBUG
- #define DEBUG_ELEMENT_PRINTF(...) element_printf(__VA_ARGS__)
- #define OpenABE_LOG_AND_THROW(str, err)                                            \
-  OpenABE_LOG_ERROR((str));                                                        \
+#define DEBUG_ELEMENT_PRINTF(...) element_printf(__VA_ARGS__)
+#define OpenABE_LOG_AND_THROW(str, err)                                                            \
+  OpenABE_LOG_ERROR((str));                                                                        \
   throw(err);
-#define OpenABE_LOG(str)                                                           \
-  OpenABE_LOG_ERROR((str));
+#define OpenABE_LOG(str) OpenABE_LOG_ERROR((str));
 
 #else
- #define DEBUG_ELEMENT_PRINTF(...)
- #define OpenABE_LOG_AND_THROW(str, err)                                            \
-  throw(err);
- #define OpenABE_LOG(str) /* do nothing */
+#define DEBUG_ELEMENT_PRINTF(...)
+#define OpenABE_LOG_AND_THROW(str, err) throw(err);
+#define OpenABE_LOG(str) /* do nothing */
 #endif
 
 /// @typedef    OpenABE_STATE
@@ -111,9 +109,9 @@ typedef uint32_t OpenABESecurityLevel;
 #include <openabe/utils/zfunctioninput.h>
 #include <openabe/utils/zpolicy.h>
 #if defined(OS_REDHAT_LINUX)
-   #include <cstddef>
-   #include <cstdio>
-   using ::max_align_t;
+#include <cstddef>
+#include <cstdio>
+using ::max_align_t;
 #endif
 #include <gmpxx.h>
 extern "C" {
@@ -159,7 +157,7 @@ const std::string DEFAULT_MATH_LIB = "OpenSSL";
 const std::string DEFAULT_MATH_LIB = "RELIC";
 #endif
 const std::string DEFAULT_BP_PARAM = "BN_P254";
-//const std::string DEFAULT_BP_PARAM = "BN_P382";
+// const std::string DEFAULT_BP_PARAM = "BN_P382";
 const std::string DEFAULT_EC_PARAM = "NIST_P256";
 
 ///
@@ -181,20 +179,19 @@ void InitializeOpenABEwithoutOpenSSL();
 void ShutdownOpenABE();
 void AssertLibInit();
 
-const char *OpenABE_errorToString(OpenABE_ERROR err);
+const char* OpenABE_errorToString(OpenABE_ERROR err);
 const uint32_t OpenABE_getLibraryVersion();
 
 // creates KEM context for PKE & ABE schemes
-OpenABEContextPKE *OpenABE_createContextPKE(std::unique_ptr<OpenABERNG> *rng,
-                                    OpenABE_SCHEME scheme_type);
-OpenABEContextABE *OpenABE_createContextABE(std::unique_ptr<OpenABERNG> *rng,
-                                    OpenABE_SCHEME scheme_type);
+OpenABEContextPKE* OpenABE_createContextPKE(std::unique_ptr<OpenABERNG>* rng,
+                                            OpenABE_SCHEME scheme_type);
+OpenABEContextABE* OpenABE_createContextABE(std::unique_ptr<OpenABERNG>* rng,
+                                            OpenABE_SCHEME scheme_type);
 
 // PKE scheme context API
 std::unique_ptr<OpenABEContextSchemePKE>
 OpenABE_createContextPKESchemeCCA(OpenABE_SCHEME scheme_type);
-std::unique_ptr<OpenABEContextCCA>
-OpenABE_createABEContextForKEM(OpenABE_SCHEME scheme_type);
+std::unique_ptr<OpenABEContextCCA> OpenABE_createABEContextForKEM(OpenABE_SCHEME scheme_type);
 
 // CPA scheme context API
 std::unique_ptr<OpenABEContextSchemeCPA>
@@ -220,7 +217,7 @@ OpenABE_SCHEME OpenABE_convertStringToSchemeID(const std::string id);
 
 OpenABECurveID OpenABE_convertStringToCurveID(const std::string paramsID);
 std::string OpenABE_convertCurveIDToString(OpenABECurveID id);
-void OpenABE_setGroupObject(std::shared_ptr<ZGroup> &group, uint8_t id);
+void OpenABE_setGroupObject(std::shared_ptr<ZGroup>& group, uint8_t id);
 
 ///
 /// OpenABE initialization per thread
@@ -263,6 +260,6 @@ public:
 private:
   bool isInitialized_;
 };
-}
+} // namespace oabe
 
 #endif /* __ZTOOLKIT_H__ */

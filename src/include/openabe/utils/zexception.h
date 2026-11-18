@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -48,7 +48,7 @@ namespace oabe {
 class MessageException : public std::exception {
 public:
   MessageException(const std::string& msg) : msg_(msg) {}
-  ~MessageException() throw () {}
+  ~MessageException() throw() {}
 
   const char* what() const throw() {
     return msg_.c_str();
@@ -60,8 +60,7 @@ protected:
 
 class CryptoException : public MessageException {
 public:
-  CryptoException(const std::string& msg) :
-      MessageException(msg) {}
+  CryptoException(const std::string& msg) : MessageException(msg) {}
 };
 
 /*!
@@ -69,11 +68,9 @@ public:
  */
 class ZCryptoBoxException : public MessageException {
 public:
-  ZCryptoBoxException(const std::string& msg) :
-      MessageException(msg) {}
+  ZCryptoBoxException(const std::string& msg) : MessageException(msg) {}
 };
 
-
-}
+} // namespace oabe
 
 #endif

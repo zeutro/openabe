@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -31,13 +31,13 @@
 /// \author J. Ayo Akinyele
 ///
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <openabe/openabe.h>
 #include <openabe/zsymcrypto.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
 
 using namespace std;
 
@@ -65,8 +65,7 @@ OpenABEContextPKE::~OpenABEContextPKE() {}
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextPKE::initializeCurve(const string groupParams) {
+OpenABE_ERROR OpenABEContextPKE::initializeCurve(const string groupParams) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   if (this->m_EllipticCurve_ != nullptr) {
     return result;
@@ -87,8 +86,7 @@ OpenABEContextPKE::initializeCurve(const string groupParams) {
  * @param[in]   Security level for the scheme.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextPKE::generateParams(OpenABESecurityLevel securityLevel) {
+OpenABE_ERROR OpenABEContextPKE::generateParams(OpenABESecurityLevel securityLevel) {
   string ecParams = OpenABE_ECParamsForSecurityLevel(securityLevel);
 
   if (ecParams == "") {
@@ -97,7 +95,6 @@ OpenABEContextPKE::generateParams(OpenABESecurityLevel securityLevel) {
 
   return this->generateParams(ecParams);
 }
-
 
 /********************************************************************************
  * Implementation of the OpenABEContextOPDH class
@@ -124,14 +121,13 @@ OpenABEContextOPDH::~OpenABEContextOPDH() {}
  * @param[in]   Specific elliptic curve to load for the scheme.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextOPDH::generateParams(const string groupParams) {
+OpenABE_ERROR OpenABEContextOPDH::generateParams(const string groupParams) {
   OpenABE_ERROR result = OpenABE_NOERROR;
 
   try {
     // Instantiate a OpenABE elliptic curve object with the given parameters
     this->initializeCurve(groupParams);
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -146,13 +142,12 @@ OpenABEContextOPDH::generateParams(const string groupParams) {
  * @param[in]   parameter ID of the Secret Key
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextOPDH::generateDecryptionKey(const string &keyID, const string &pkID,
-                                      const string &skID) {
+OpenABE_ERROR OpenABEContextOPDH::generateDecryptionKey(const string& keyID, const string& pkID,
+                                                        const string& skID) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> PK = nullptr, SK = nullptr;
   OpenABEByteString uid;
-  OpenABERNG *myRNG = this->getRNG();
+  OpenABERNG* myRNG = this->getRNG();
 
   try {
     // Assert that the RNG has been set
@@ -167,10 +162,8 @@ OpenABEContextOPDH::generateDecryptionKey(const string &keyID, const string &pkI
     G_t A = g.exp(a);
 
     // initialize containers for the keys
-    PK.reset(new OpenABEKey(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH,
-                        keyID, &uid));
-    SK.reset(new OpenABEKey(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH,
-                        keyID, &uid));
+    PK.reset(new OpenABEKey(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH, keyID, &uid));
+    SK.reset(new OpenABEKey(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH, keyID, &uid));
 
     PK->setComponent("A", &A);
     SK->setComponent("a", &a);
@@ -179,7 +172,7 @@ OpenABEContextOPDH::generateDecryptionKey(const string &keyID, const string &pkI
     this->getKeystore()->addKey(pkID, PK, KEY_TYPE_PUBLIC);
     this->getKeystore()->addKey(skID, SK, KEY_TYPE_SECRET);
 
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -190,8 +183,10 @@ OpenABEContextOPDH::generateDecryptionKey(const string &keyID, const string &pkI
  * Generate and encrypt a symmetric key using the key encapsulation mode
  * of the scheme. Return the key and ciphertext.
  *
- * @param[in]   random number generator to use during encryption (it is optional: could be set to NULL here).
- * @param[in]	public key identifier in keystore for the recipient (assumes it's already in keystore).
+ * @param[in]   random number generator to use during encryption (it is
+ * optional: could be set to NULL here).
+ * @param[in]	public key identifier in keystore for the recipient (assumes
+ * it's already in keystore).
  * @param[in]   public key UID for sender.
  * @param[in]   length of the symmetric key.
  * @param[out]  symmetric key to be returned (must be allocated).
@@ -199,13 +194,12 @@ OpenABEContextOPDH::generateDecryptionKey(const string &keyID, const string &pkI
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextOPDH::encryptKEM(OpenABERNG *rng, const string &pkID,
-                           OpenABEByteString *senderID, uint32_t keyBitLen,
-                           const std::shared_ptr<OpenABESymKey> &key,
-                           OpenABECiphertext *ciphertext) {
+OpenABE_ERROR OpenABEContextOPDH::encryptKEM(OpenABERNG* rng, const string& pkID,
+                                             OpenABEByteString* senderID, uint32_t keyBitLen,
+                                             const std::shared_ptr<OpenABESymKey>& key,
+                                             OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
-  OpenABERNG *myRNG = this->getRNG();
+  OpenABERNG* myRNG = this->getRNG();
 
   try {
     // check inputs
@@ -233,7 +227,7 @@ OpenABEContextOPDH::encryptKEM(OpenABERNG *rng, const string &pkID,
     ciphertext->setComponent("C", &C);
 
     // compute P = A ^ e => shared key: g^(a*e)
-    G_t *A = PK->getG_t("A");
+    G_t* A = PK->getG_t("A");
     ASSERT_NOTNULL(A);
 
     G_t P = A->exp(e);
@@ -248,18 +242,16 @@ OpenABEContextOPDH::encryptKEM(OpenABERNG *rng, const string &pkID,
     kdfMetadata = kdfMetadata + *senderID + PK->getUID();
 
     unique_ptr<OpenABEKDF> kdf(new OpenABEKDF);
-    OpenABEByteString DerivedKeyMaterial =
-        kdf->DeriveKey(Z, keyBitLen, kdfMetadata);
+    OpenABEByteString DerivedKeyMaterial = kdf->DeriveKey(Z, keyBitLen, kdfMetadata);
     // return the derived key material
     key->setSymmetricKey(DerivedKeyMaterial);
     // set the ciphertext header (curve ID, scheme ID, etc)
-    ciphertext->setHeader(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH,
-                          myRNG);
+    ciphertext->setHeader(this->getECCurve()->getCurveID(), OpenABE_SCHEME_PK_OPDH, myRNG);
     // clear memory
     DerivedKeyMaterial.zeroize();
     kdfMetadata.clear();
     Z.clear();
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -270,16 +262,17 @@ OpenABEContextOPDH::encryptKEM(OpenABERNG *rng, const string &pkID,
  * Decrypt a symmetric key using the key encapsulation mode
  * of the scheme. Return the key.
  *
- * @param[in]   public key identifier of the sender (assumes it's already in keystore).
- * @param[in]   secret key identifier of recipient (assumes it's already in keystore).
+ * @param[in]   public key identifier of the sender (assumes it's already in
+ * keystore).
+ * @param[in]   secret key identifier of recipient (assumes it's already in
+ * keystore).
  * @param[in]   PKE ciphertext.
  * @param[out]  symmetric key to be returned.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextOPDH::decryptKEM(const string &pkID, const string &skID,
-                           OpenABECiphertext *ciphertext, uint32_t keyBitLen,
-                           const std::shared_ptr<OpenABESymKey> &key) {
+OpenABE_ERROR OpenABEContextOPDH::decryptKEM(const string& pkID, const string& skID,
+                                             OpenABECiphertext* ciphertext, uint32_t keyBitLen,
+                                             const std::shared_ptr<OpenABESymKey>& key) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> SK = nullptr, PK = nullptr;
   OpenABEByteString senderID;
@@ -306,9 +299,9 @@ OpenABEContextOPDH::decryptKEM(const string &pkID, const string &skID,
 
     // compute C ^ (recipient's private key)
     // to obtain the shared key
-    G_t *C = ciphertext->getG_t("C");
+    G_t* C = ciphertext->getG_t("C");
     ASSERT_NOTNULL(C);
-    ZP_t *a = SK->getZP_t("a");
+    ZP_t* a = SK->getZP_t("a");
     ASSERT_NOTNULL(a);
     G_t P = C->exp(*a);
     // extract x-coordinate from group element P
@@ -321,8 +314,7 @@ OpenABEContextOPDH::decryptKEM(const string &pkID, const string &skID,
     kdfMetadata = kdfMetadata + senderID + SK->getUID();
 
     kdf.reset(new OpenABEKDF);
-    OpenABEByteString DerivedKeyMaterial =
-        kdf->DeriveKey(Z, keyBitLen, kdfMetadata);
+    OpenABEByteString DerivedKeyMaterial = kdf->DeriveKey(Z, keyBitLen, kdfMetadata);
 
     // return the derived key material
     key->setSymmetricKey(DerivedKeyMaterial);
@@ -332,7 +324,7 @@ OpenABEContextOPDH::decryptKEM(const string &pkID, const string &skID,
     kdfMetadata.zeroize();
     Z.zeroize();
 
-  } catch (OpenABE_ERROR &err) {
+  } catch (OpenABE_ERROR& err) {
     result = err;
   }
 
@@ -346,9 +338,9 @@ OpenABEContextOPDH::decryptKEM(const string &pkID, const string &skID,
  * @param[in]   A OpenABEKey public key to be validated.
  * @return  true or false.
  */
-bool OpenABEContextOPDH::validatePublicKey(const std::shared_ptr<OpenABEKey> &key) {
+bool OpenABEContextOPDH::validatePublicKey(const std::shared_ptr<OpenABEKey>& key) {
   ASSERT_NOTNULL(key);
-  G_t *A = key->getG_t("A");
+  G_t* A = key->getG_t("A");
   /* make sure element exists in OpenABEKey structure */
   ASSERT_NOTNULL(A);
 
@@ -398,9 +390,9 @@ bool OpenABEContextOPDH::validatePublicKey(const std::shared_ptr<OpenABEKey> &ke
  * @param[in]   A OpenABEKey private key to be validated.
  * @return  true or false.
  */
-bool OpenABEContextOPDH::validatePrivateKey(const std::shared_ptr<OpenABEKey> &key) {
+bool OpenABEContextOPDH::validatePrivateKey(const std::shared_ptr<OpenABEKey>& key) {
   ASSERT_NOTNULL(key);
-  ZP_t *a = key->getZP_t("a");
+  ZP_t* a = key->getZP_t("a");
   ASSERT_NOTNULL(a);
   /* retrieve the order of the EC points */
   ZP_t p = this->getECCurve()->getGroupOrder();
@@ -438,8 +430,7 @@ OpenABEContextSchemePKE::~OpenABEContextSchemePKE() {}
  * @param[in]   Specific elliptic curve to load for the scheme.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::generateParams(const string groupParams) {
+OpenABE_ERROR OpenABEContextSchemePKE::generateParams(const string groupParams) {
   return this->m_KEM_->generateParams(groupParams);
 }
 
@@ -451,9 +442,8 @@ OpenABEContextSchemePKE::generateParams(const string groupParams) {
  * @param[in]   parameter ID of the Secret Key
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::keygen(const string &keyID, const string &pkID,
-                            const string &skID) {
+OpenABE_ERROR OpenABEContextSchemePKE::keygen(const string& keyID, const string& pkID,
+                                              const string& skID) {
   return this->m_KEM_->generateDecryptionKey(keyID, pkID, skID);
 }
 
@@ -461,19 +451,18 @@ OpenABEContextSchemePKE::keygen(const string &keyID, const string &pkID,
  * Export a key from the keystore given the key identifier.
  *
  * @param[in]   identifier for the key.
- * @param[out]  an allocated OpenABEByteString to store the exported key header/body.
+ * @param[out]  an allocated OpenABEByteString to store the exported key
+ * header/body.
  * @param[in]   a password to encrypt the exported key under (optional).
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::exportKey(const string &keyID, OpenABEByteString &keyBlob) {
+OpenABE_ERROR OpenABEContextSchemePKE::exportKey(const string& keyID, OpenABEByteString& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEByteString tmpKeyBlob;
 
   try {
     // Attempt to export the given keyID to a temp keyBlob output buffer
-    if (OpenABE_exportKey(this->m_KEM_->getKeystore(), keyID, &tmpKeyBlob) !=
-        OpenABE_NOERROR) {
+    if (OpenABE_exportKey(this->m_KEM_->getKeystore(), keyID, &tmpKeyBlob) != OpenABE_NOERROR) {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
 
@@ -482,7 +471,7 @@ OpenABEContextSchemePKE::exportKey(const string &keyID, OpenABEByteString &keyBl
     keyBlob += tmpKeyBlob;
     // Clear the temp buffer
     tmpKeyBlob.zeroize();
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -497,16 +486,15 @@ OpenABEContextSchemePKE::exportKey(const string &keyID, OpenABEByteString &keyBl
  * @param[in]   a password to decrypt the key blob under (optional).
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::loadPublicKey(const string &keyID, OpenABEByteString &keyBlob) {
+OpenABE_ERROR OpenABEContextSchemePKE::loadPublicKey(const string& keyID,
+                                                     OpenABEByteString& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> PK = nullptr;
 
   try {
     // Parse the result into a OpenABEKey structure
     OpenABEByteString outputKeyBytes;
-    PK = this->m_KEM_->getKeystore()->constructKeyFromBytes(keyID, keyBlob,
-                                                            outputKeyBytes);
+    PK = this->m_KEM_->getKeystore()->constructKeyFromBytes(keyID, keyBlob, outputKeyBytes);
     if (PK == nullptr) {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
@@ -514,8 +502,7 @@ OpenABEContextSchemePKE::loadPublicKey(const string &keyID, OpenABEByteString &k
     // Initialize the curve if ec parameters are not set
     if (this->m_KEM_->getECCurve() == nullptr) {
       // Set parameters based on the PK's curve ID
-      this->m_KEM_->initializeCurve(
-          OpenABE_convertECCurveIDToString(PK->getCurveID()));
+      this->m_KEM_->initializeCurve(OpenABE_convertECCurveIDToString(PK->getCurveID()));
     }
 
     if (PK->getCurveID() != this->m_KEM_->getECCurve()->getCurveID() ||
@@ -535,7 +522,7 @@ OpenABEContextSchemePKE::loadPublicKey(const string &keyID, OpenABEByteString &k
       throw OpenABE_ERROR_INVALID_PARAMS;
     }
 
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -543,31 +530,30 @@ OpenABEContextSchemePKE::loadPublicKey(const string &keyID, OpenABEByteString &k
 }
 
 /*!
- * Load a private key into the keystore given a key identifier and blob of bytes.
+ * Load a private key into the keystore given a key identifier and blob of
+ * bytes.
  *
  * @param[in]   identifier for the key.
  * @param[in]   a OpenABEByteString to load the key header/body.
  * @param[in]   a password to decrypt the key blob under (optional).
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::loadPrivateKey(const string &keyID, OpenABEByteString &keyBlob) {
+OpenABE_ERROR OpenABEContextSchemePKE::loadPrivateKey(const string& keyID,
+                                                      OpenABEByteString& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> SK = nullptr;
 
   try {
     // Parse the keyBlob into a OpenABEKey structure
     OpenABEByteString outputKeyBytes;
-    SK = this->m_KEM_->getKeystore()->constructKeyFromBytes(keyID, keyBlob,
-                                                            outputKeyBytes);
+    SK = this->m_KEM_->getKeystore()->constructKeyFromBytes(keyID, keyBlob, outputKeyBytes);
     if (SK == nullptr) {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
     // Initialize the curve if ec parameters are not set
     if (this->m_KEM_->getECCurve() == nullptr) {
       // Set parameters based on the PK's curve ID
-      this->m_KEM_->initializeCurve(
-          OpenABE_convertECCurveIDToString(SK->getCurveID()));
+      this->m_KEM_->initializeCurve(OpenABE_convertECCurveIDToString(SK->getCurveID()));
     }
 
     if (SK->getCurveID() != this->m_KEM_->getECCurve()->getCurveID() ||
@@ -585,7 +571,7 @@ OpenABEContextSchemePKE::loadPrivateKey(const string &keyID, OpenABEByteString &
     } else {
       throw OpenABE_ERROR_INVALID_PARAMS;
     }
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -598,8 +584,7 @@ OpenABEContextSchemePKE::loadPrivateKey(const string &keyID, OpenABEByteString &
  * @param[in]   a string key identifier.
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::deleteKey(const string &keyID) {
+OpenABE_ERROR OpenABEContextSchemePKE::deleteKey(const string& keyID) {
   return this->m_KEM_->getKeystore()->deleteKey(keyID);
 }
 
@@ -608,17 +593,18 @@ OpenABEContextSchemePKE::deleteKey(const string &keyID) {
  * of the underlying scheme. Use the symmetric key with AES-GCM to encrypt
  * the plaintext. Return the ciphertext.
  *
- * @param[in]   random number generator to use during encryption (it is optional: could be set to NULL here).
- * @param[in]	public key identifier in keystore for the recipient (assumes it's already in keystore).
+ * @param[in]   random number generator to use during encryption (it is
+ * optional: could be set to NULL here).
+ * @param[in]	public key identifier in keystore for the recipient (assumes
+ * it's already in keystore).
  * @param[in]   public key UID for sender.
  * @param[in]   the plaintext.
  * @param[out]	PKE ciphertext (must be allocated).
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::encrypt(OpenABERNG *rng, const string &pkID,
-                             const string &senderpkID, const string &plaintext,
-                             OpenABECiphertext *ciphertext) {
+OpenABE_ERROR OpenABEContextSchemePKE::encrypt(OpenABERNG* rng, const string& pkID,
+                                               const string& senderpkID, const string& plaintext,
+                                               OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABEKey> senderPK = nullptr;
   OpenABEByteString senderID, keyBytes, ctHdr, iv, ct, tag;
@@ -637,15 +623,13 @@ OpenABEContextSchemePKE::encrypt(OpenABERNG *rng, const string &pkID,
     }
     senderID = senderPK->getUID();
     // Returns a ciphertext and a symmetric key
-    result = this->m_KEM_->encryptKEM(rng, pkID, &senderID,
-                                      DEFAULT_SYM_KEY_BITS, key, ciphertext);
+    result = this->m_KEM_->encryptKEM(rng, pkID, &senderID, DEFAULT_SYM_KEY_BITS, key, ciphertext);
     // Propagate errors from encryptKEM
     ASSERT(result == OpenABE_NOERROR, result);
 
     // Instantiate an auth enc scheme with the symmetric key
     keyBytes = key->getKeyBytes();
-    authEnc.reset(
-        new oabe::crypto::OpenABESymKeyAuthEnc(DEFAULT_AES_SEC_LEVEL, keyBytes));
+    authEnc.reset(new oabe::crypto::OpenABESymKeyAuthEnc(DEFAULT_AES_SEC_LEVEL, keyBytes));
     // Obtain header from ciphertext
     ciphertext->getHeader(ctHdr);
     // Embed the header of the ciphertext as AAD
@@ -656,7 +640,7 @@ OpenABEContextSchemePKE::encrypt(OpenABERNG *rng, const string &pkID,
     ciphertext->setComponent("IV", &iv);
     ciphertext->setComponent("CT", &ct);
     ciphertext->setComponent("Tag", &tag);
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -674,14 +658,13 @@ OpenABEContextSchemePKE::encrypt(OpenABERNG *rng, const string &pkID,
  * keystore).
  * @param[in]   secret key identifier of recipient (assumes it's already in
  * keystore).
- * @param[out]  OpenABEByteString object to store resulting plaintext (assumes it's
- * already allocated).
+ * @param[out]  OpenABEByteString object to store resulting plaintext (assumes
+ * it's already allocated).
  * @param[in]   PKE ciphertext.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemePKE::decrypt(const string &pkID, const string &skID,
-                             string &plaintext, OpenABECiphertext *ciphertext) {
+OpenABE_ERROR OpenABEContextSchemePKE::decrypt(const string& pkID, const string& skID,
+                                               string& plaintext, OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABESymKey> key(new OpenABESymKey);
   unique_ptr<oabe::crypto::OpenABESymKeyAuthEnc> authEnc = nullptr;
@@ -689,8 +672,7 @@ OpenABEContextSchemePKE::decrypt(const string &pkID, const string &skID,
   OpenABEByteString ctHdr, keyBytes;
 
   try {
-    result = this->m_KEM_->decryptKEM(pkID, skID, ciphertext,
-                                      DEFAULT_SYM_KEY_BITS, key);
+    result = this->m_KEM_->decryptKEM(pkID, skID, ciphertext, DEFAULT_SYM_KEY_BITS, key);
     // propagate errors from decryptKEM
     ASSERT(result == OpenABE_NOERROR, result);
 
@@ -704,8 +686,7 @@ OpenABEContextSchemePKE::decrypt(const string &pkID, const string &skID,
 
     // Instantiate an auth enc scheme with the symmetric key
     keyBytes = key->getKeyBytes();
-    authEnc.reset(
-        new oabe::crypto::OpenABESymKeyAuthEnc(DEFAULT_AES_SEC_LEVEL, keyBytes));
+    authEnc.reset(new oabe::crypto::OpenABESymKeyAuthEnc(DEFAULT_AES_SEC_LEVEL, keyBytes));
     // embed the header of the ciphertext
     ciphertext->getHeader(ctHdr);
     // embed the header of the ciphertext as AAD
@@ -714,7 +695,7 @@ OpenABEContextSchemePKE::decrypt(const string &pkID, const string &skID,
     if (!authEnc->decrypt(plaintext, iv, ct, tag)) {
       throw OpenABE_ERROR_DECRYPTION_FAILED;
     }
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -722,4 +703,4 @@ OpenABEContextSchemePKE::decrypt(const string &pkID, const string &skID,
   keyBytes.zeroize();
   return result;
 }
-}
+} // namespace oabe

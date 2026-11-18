@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest a new capability or an improvement to an existing one.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Some frequently requested features are already tracked in [Known Limitations](https://github.com/Claudiocli/openabe/wiki/Known-Limitations): multi-authority ABE, key revocation, Python on Windows, self-contained headers. If yours is one of them, say so below and add your use case.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Cryptography (new scheme, curve or primitive)
+        - Policy / attribute language
+        - C++ API
+        - CLI tools
+        - Python bindings
+        - Build system / platforms
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you trying to do, and why is it hard or impossible today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How you would like it to work. API sketches or example policies are welcome.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you use today, or other approaches you rejected.
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security considerations
+      description: |
+        Required for cryptographic changes: which security notion (CPA/CCA), assumptions, and references (papers, standards). Leave empty if not applicable.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to implement this myself (see [CONTRIBUTING](https://github.com/Claudiocli/openabe/blob/master/CONTRIBUTING.md)).

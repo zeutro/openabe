@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -32,10 +32,10 @@
 /// \author J. Ayo Akinyele
 ///
 
+#include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 
 #include <openabe/openabe.h>
@@ -43,7 +43,7 @@
 using namespace std;
 using namespace oabe;
 
-void getFile(std::string &result, const std::string &filename) {
+void getFile(std::string& result, const std::string& filename) {
   result.clear();
 
   fstream fs(filename, fstream::in);
@@ -63,7 +63,7 @@ void getFile(std::string &result, const std::string &filename) {
   fs.close();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // check that we have appropriate # of args
   if (argc < 2) {
     cerr << "Usage " << argv[0] << ": [ input file ]" << endl;
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     for (auto p : attr_list_strings) {
       cout << "Input: " << p << endl;
       std::unique_ptr<OpenABEAttributeList> attrList = createAttributeList(p);
-      if(attrList != nullptr) {
+      if (attrList != nullptr) {
         cout << "AttrList Full: " << attrList->toString() << endl;
         cout << "AttrList Compact: " << attrList->toCompactString() << endl;
       } else {

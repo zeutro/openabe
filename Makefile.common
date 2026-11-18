@@ -3,6 +3,9 @@
 CC ?= g++
 CXX ?= g++
 
+# Without this fix the Makefile invokes MINGW_MAKE always, instead of on Windows override
+MINGW_MAKE ?= make
+
 LDLIBS ?= -lgtest -lpthread
 
 DEPS_INSTALL_ZROOT = $(ZROOT)/deps/root
@@ -14,13 +17,15 @@ LOCAL_INSTALL_BIN ?= /usr/local/bin
 
 # Include locations
 #  Dependencies (C/C++)
-CCFLAGS = -I$(DEPS_INSTALL_ZROOT)/include
-CXXFLAGS := -I$(DEPS_INSTALL_ZROOT)/include
+CCFLAGS = -I"$(DEPS_INSTALL_ZROOT)"/include
+CXXFLAGS := -I"$(DEPS_INSTALL_ZROOT)"/include
 #  Local includes (for generated headers from bison/flex)
-CXXFLAGS += -I$(ZROOT)/src
+CXXFLAGS += -I"$(ZROOT)/src"
 #  Common includes (C/C++)
-CCFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
-CXXFLAGS += -I$(INCLUDE_ROOT) -I$(LOCAL_INCLUDE)
+CCFLAGS += -I"$(INCLUDE_ROOT)" -I"$(LOCAL_INCLUDE)"
+CXXFLAGS += -I"$(INCLUDE_ROOT)" -I"$(LOCAL_INCLUDE)"
+# Fix for the "missing openabe.h"
+CXXFLAGS += -I"$(ZROOT)/src/include"
 
 RELIC_LIB = -lrelic -lrelic_ec
 RELIC_LIB_STATIC = -lrelic_s -lrelic_s_ec
@@ -29,7 +34,7 @@ SSL_LIB = -lssl
 CRYPTO_LIB = -lcrypto
 RELIC_G =
 # commit: 1e3f62a3823f7e3db9d403f724fd9d66f5b04cf8 (as of 7/18/17)
-OPENSSL_VERSION := 1.1.1-dev
+OPENSSL_VERSION := 4.0.1
 
 # Set flags for C++ 11
 OLD_GPP = $(shell g++ --version | grep -q 4.6 && echo 1)
@@ -37,7 +42,8 @@ ifeq ($(OLD_GPP), 1)
     CXX11FLAGS = -std=c++0x
     CXXFLAGS += $(CXX11FLAGS)
 else
-    CXX11FLAGS = -std=c++11
+#     CXX11FLAGS = -std=c++11 -include cstdint
+    CXX11FLAGS = -std=c++17 -include cstdint
     CXXFLAGS += $(CXX11FLAGS)
 endif
 
@@ -45,16 +51,21 @@ endif
 DEPS_PACKAGES = $(if $(USE_DEPS),$(USE_DEPS),relic openssl gtest)
 ADD_CFLAGS :=
 OS_CXXFLAGS :=
-WITH_BP := 
+WITH_BP :=
+
+# Fallback: detect MSYS2/MinGW even when the OS env var is not set
+ifeq ($(OS),)
+  ifneq (,$(findstring MINGW,$(shell uname -s)))
+    OS := Windows_NT
+  endif
+endif
 
 ifeq ($(OS), Windows_NT)
     RELIC_OS := WINDOWS
-    # NOTE: relic build still broken for MINGW
-    DEPS_PACKAGES = openssl
-    WITH_BP := "with-bp"
-    OPENSSL_VERSION := 1.1.1-dev-bp
+    MINGW_MAKE := /mingw64/bin/mingw32-make
+    DEPS_PACKAGES = openssl relic
     COMPILER_VARS := -G "MinGW Makefiles" -DSEED=WCGR
-    CMAKE_VARS := -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe CMAKE_INCLUDE_PATH="/usr/local/include" CMAKE_LIBRARY_PATH="/usr/local/lib"
+    CMAKE_VARS := -DCMAKE_MAKE_PROGRAM=$(MINGW_MAKE) -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe -DCMAKE_INCLUDE_PATH="/usr/local/include" -DCMAKE_LIBRARY_PATH="/usr/local/lib"
     SHLIB := dll
     GTESTEXT := $(SHLIB)
     # No need to set -fPIC for windows as all code is position independent by default.
@@ -62,10 +73,10 @@ ifeq ($(OS), Windows_NT)
     SHFLAGS := -nostartfiles
     OPENSSL_CONFIG := Configure mingw64 shared
     # needed for static libs
-    OS_OBJS += /mingw64/x86_64-w64-mingw32/lib/dllcrt1.o
+    OS_OBJS += /mingw64/lib/dllcrt1.o
     # for network func
     OS_LIBS += -lwsock32 -lws2_32
-    #ADD_FLAGS := 
+    #ADD_FLAGS :=
 else
     OS_NAME = $(shell uname -s)
     ifeq ($(OS_NAME), Linux)
@@ -85,6 +96,11 @@ else
        CCFLAGS += -fPIC
        OPENSSL_CONFIG = config shared
        ADD_CFLAGS += -Wno-implicit-function-declaration
+	   # OpenSSF Compiler Hardened Guide
+	   # https://best.openssf.org/Compiler-Hardening-Guides/
+       CXXFLAGS += -D_GLIBCXX_ASSERTIONS -fstack-clash-protection
+       CCFLAGS += -fstack-clash-protection
+       LDFLAGS += -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack
     endif
     ifeq ($(OS_NAME), Darwin)
        RELIC_OS = MACOSX
@@ -96,11 +112,18 @@ else
        CXXFLAGS += -I$(LOCAL_INCLUDE) $(OS_CXXFLAGS)
        # include the clang C++ standard library (as a result, enable TR1_TUPLE flag)
        CXXFLAGS += -stdlib=libc++ -DGTEST_USE_OWN_TR1_TUPLE=1 -Wno-deprecated
+	   # OpenSSF Compiler Hardened Guide
+	   # https://best.openssf.org/Compiler-Hardening-Guides/
+       CXXFLAGS += -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_FAST
        # (Option to use GMP with OpenSSL?): -DOPENSSL_USE_GMP -lgmp
-       OPENSSL_CONFIG := Configure darwin64-x86_64-cc shared
+       UNAME_M := $(shell uname -m)
+       ifeq ($(UNAME_M), arm64)
+          OPENSSL_CONFIG := Configure darwin64-arm64-cc shared
+       else
+          OPENSSL_CONFIG := Configure darwin64-x86_64-cc shared
+       endif
        ADD_CFLAGS += -Wno-implicit-function-declaration -Wno-macro-redefined
     endif
-    # TODO: add check for ARM, etc
 endif
 
 PTHREAD_LIB = -lpthread
@@ -114,8 +137,13 @@ CXXFLAGS += -Wall
 CXXFLAGS += -fstrict-overflow -Wsign-compare
 
 # Add debug symbols (we must remove these in a production build)
-CXXFLAGS += -g -O2 
-# uncomment to enable Address sanitizer 
+CXXFLAGS += -g -O2
+# Further OpenSSF recommendation-based hardening
+CXXFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector-strong \
+			-Wformat -Wformat=2 -Werror=format-security
+CCFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector-strong \
+			-Wformat -Wformat=2 -Werror=format-security
+# uncomment to enable Address sanitizer
 #CXXFLAGS += -fsanitize=address -ggdb
 # uncomment to switch to afl-fuzz
 # CC="afl-gcc" # for linux
@@ -123,7 +151,7 @@ CXXFLAGS += -g -O2
 # CC="afl-clang" # for mac
 # CXX="afl-clang++"
 
-LDFLAGS += -L$(DEPS_INSTALL_ZROOT)/lib -L$(OABE_LIB_ROOT) -L$(LOCAL_LIB_ROOT)
+LDFLAGS += -L"$(DEPS_INSTALL_ZROOT)/lib" -L"$(DEPS_INSTALL_ZROOT)/lib64" -L"$(OABE_LIB_ROOT)" -L"$(LOCAL_LIB_ROOT)"
 
 # Zeutro Math library config: RELIC vs OPENSSL
 # Look for environment variable ZML_LIB=with_openssl
@@ -133,10 +161,11 @@ ifeq ($(ZML_LIB), with_openssl)
   OPENSSL_ZML += -DBP_WITH_OPENSSL
   CXXFLAGS += $(OPENSSL_ZML)
   CCFLAGS += -g -O2 $(OPENSSL_ZML)
+  OABELDSHLIBS = $(RELIC_LIB)
 else
   # relic-only build for math ops
   CXXFLAGS += $(OPENSSL_ZML)
-  CCFLAGS += -g -O2 $(OPENSSL_ZML) $(ADD_CFLAGS) 
+  CCFLAGS += -g -O2 $(OPENSSL_ZML) $(ADD_CFLAGS)
   OABELDLIBS = $(RELIC_LIB_STATIC)
   OABELDSHLIBS = $(RELIC_LIB)
 endif
@@ -150,10 +179,10 @@ SHLIB_PATH = $(LDFLAGS)
 
 define COMMON_LIB_template
 $(1): $(1)($$($(1)_OBJS))
-	mkdir -p $(OABE_LIB_ROOT)
-	cp $$@ $(OABE_LIB_ROOT)
-	mkdir -p $(INCLUDE_ROOT)
-	-cp -r include/* $(INCLUDE_ROOT)
+	mkdir -p "$(OABE_LIB_ROOT)"
+	cp $$@ "$(OABE_LIB_ROOT)"
+	mkdir -p "$(INCLUDE_ROOT)"
+	-cp -r include/* "$(INCLUDE_ROOT)"
 endef
 
 # COMMON_LIBS, and the objects they use must be defined *before* this

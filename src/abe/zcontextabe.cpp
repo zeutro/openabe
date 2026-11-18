@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -31,10 +31,10 @@
 /// \author J. Ayo Akinyele
 ///
 
+#include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 
 using namespace std;
@@ -65,8 +65,7 @@ OpenABEContextABE::~OpenABEContextABE() {}
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextABE::initializeCurve(const string groupParams) {
+OpenABE_ERROR OpenABEContextABE::initializeCurve(const string groupParams) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   if (this->m_Pairing_ != nullptr) {
     return result;
@@ -79,7 +78,6 @@ OpenABEContextABE::initializeCurve(const string groupParams) {
   return result;
 }
 
-
 /********************************************************************************
  * Implementation of the OpenABEContextSchemeCPA class
  ********************************************************************************/
@@ -91,7 +89,7 @@ OpenABEContextABE::initializeCurve(const string groupParams) {
 OpenABEContextSchemeCPA::OpenABEContextSchemeCPA(unique_ptr<OpenABEContextABE> kem_) : ZObject() {
   ASSERT_NOTNULL(kem_.get());
   if (kem_->getSchemeType() == OpenABE_SCHEME_KP_GPSW ||
-             kem_->getSchemeType() == OpenABE_SCHEME_CP_WATERS) {
+      kem_->getSchemeType() == OpenABE_SCHEME_CP_WATERS) {
     this->isMAABE = false;
   } else {
     /* unrecognized scheme type */
@@ -114,22 +112,19 @@ OpenABEContextSchemeCPA::~OpenABEContextSchemeCPA() {}
  * @param[in]   a string identifier for the master secret parameters.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::generateParams(const string groupParams, const string &mpkID,
-                                 const string &mskID) {
+OpenABE_ERROR OpenABEContextSchemeCPA::generateParams(const string groupParams, const string& mpkID,
+                                                      const string& mskID) {
   return this->m_KEM_->generateParams(groupParams, mpkID, mskID);
 }
 
-OpenABE_ERROR
-OpenABEContextSchemeCPA::generateGlobalParams(const string groupParams,
-                                       const string &gpkID) {
+OpenABE_ERROR OpenABEContextSchemeCPA::generateGlobalParams(const string groupParams,
+                                                            const string& gpkID) {
   return OpenABE_ERROR_NOT_IMPLEMENTED;
 }
 
-OpenABE_ERROR
-OpenABEContextSchemeCPA::generateAuthorityParams(const string &gpkID,
-                                          const string &auth_mpkID,
-                                          const string &auth_mskID) {
+OpenABE_ERROR OpenABEContextSchemeCPA::generateAuthorityParams(const string& gpkID,
+                                                               const string& auth_mpkID,
+                                                               const string& auth_mskID) {
   return OpenABE_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -140,34 +135,31 @@ OpenABEContextSchemeCPA::generateAuthorityParams(const string &gpkID,
  * @param[out]  a pointer to the internal OpenABEByteString of the hash key
  * @return      OpenABEByteString of hash key (should not be freed by caller)
  */
-OpenABEByteString*
-OpenABEContextSchemeCPA::getHashKey(const std::string &mpkID) {
-	std::shared_ptr<OpenABEKey> MPK = this->m_KEM_->getKeystore()->getPublicKey(mpkID);
-	if (!MPK) {
-	    throw OpenABE_ERROR_INVALID_PARAMS;
-	} else {
-		// hash key defined for every scheme in the OpenABE
-		return MPK->getByteString("k");
-	}
+OpenABEByteString* OpenABEContextSchemeCPA::getHashKey(const std::string& mpkID) {
+  std::shared_ptr<OpenABEKey> MPK = this->m_KEM_->getKeystore()->getPublicKey(mpkID);
+  if (!MPK) {
+    throw OpenABE_ERROR_INVALID_PARAMS;
+  } else {
+    // hash key defined for every scheme in the OpenABE
+    return MPK->getByteString("k");
+  }
 }
-
 
 /*!
  * Export a key from the keystore given the key identifier.
  *
  * @param[in]   identifier for the key.
- * @param[out]  an allocated OpenABEByteString to store the exported key header/body.
+ * @param[out]  an allocated OpenABEByteString to store the exported key
+ * header/body.
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::exportKey(const string &keyID, OpenABEByteString &keyBlob) {
+OpenABE_ERROR OpenABEContextSchemeCPA::exportKey(const string& keyID, OpenABEByteString& keyBlob) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   OpenABEByteString tmpKeyBlob;
 
   try {
     // attempt to export the given keyID to a temp keyBlob output buffer
-    if (OpenABE_exportKey(this->m_KEM_->getKeystore(), keyID, &tmpKeyBlob) !=
-        OpenABE_NOERROR) {
+    if (OpenABE_exportKey(this->m_KEM_->getKeystore(), keyID, &tmpKeyBlob) != OpenABE_NOERROR) {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
 
@@ -176,7 +168,7 @@ OpenABEContextSchemeCPA::exportKey(const string &keyID, OpenABEByteString &keyBl
     keyBlob += tmpKeyBlob;
     // clear the temp buffer
     tmpKeyBlob.clear();
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
@@ -188,16 +180,16 @@ OpenABEContextSchemeCPA::exportKey(const string &keyID, OpenABEByteString &keyBl
  *
  * @param[in]	identifier for the key.
  * @param[in]	serialized blob that represents the key parameters.
- * @param[in]	an optional password to derive a key for decrypting the serialized blob.
+ * @param[in]	an optional password to derive a key for decrypting the
+ * serialized blob.
  * @param[in]   a key type for designating storage in keystore.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::loadKey(const string &ID, OpenABEByteString &keyBlob,
-                          zKeyType keyType) {
+OpenABE_ERROR OpenABEContextSchemeCPA::loadKey(const string& ID, OpenABEByteString& keyBlob,
+                                               zKeyType keyType) {
   OpenABEByteString outputKeyBytes;
-  shared_ptr<OpenABEKey> KEY = this->m_KEM_->getKeystore()->parseKeyHeader(
-      ID, keyBlob, outputKeyBytes);
+  shared_ptr<OpenABEKey> KEY =
+      this->m_KEM_->getKeystore()->parseKeyHeader(ID, keyBlob, outputKeyBytes);
   if (KEY == nullptr) {
     return OpenABE_ERROR_INVALID_INPUT;
   }
@@ -227,12 +219,12 @@ OpenABEContextSchemeCPA::loadKey(const string &ID, OpenABEByteString &keyBlob,
  *
  * @param[in]	identifier for the public key in the keystore.
  * @param[in]	serialized blob that represents the public parameters.
- * @param[in]	an optional password to derive a key for decrypting the serialized blob.
+ * @param[in]	an optional password to derive a key for decrypting the
+ * serialized blob.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::loadMasterPublicParams(const string &mpkID,
-                                         OpenABEByteString &mpkBlob) {
+OpenABE_ERROR OpenABEContextSchemeCPA::loadMasterPublicParams(const string& mpkID,
+                                                              OpenABEByteString& mpkBlob) {
   return this->loadKey(mpkID, mpkBlob, KEY_TYPE_PUBLIC);
 }
 
@@ -241,12 +233,12 @@ OpenABEContextSchemeCPA::loadMasterPublicParams(const string &mpkID,
  *
  * @param[in]	identifier for the secret key in the keystore.
  * @param[in]	serialized blob that represents the secret parameters.
- * @param[in]	an optional password to derive a key for decrypting the serialized blob.
+ * @param[in]	an optional password to derive a key for decrypting the
+ * serialized blob.
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::loadMasterSecretParams(const string &mskID,
-                                         OpenABEByteString &mskBlob) {
+OpenABE_ERROR OpenABEContextSchemeCPA::loadMasterSecretParams(const string& mskID,
+                                                              OpenABEByteString& mskBlob) {
   return this->loadKey(mskID, mskBlob, KEY_TYPE_SECRET);
 }
 
@@ -255,16 +247,15 @@ OpenABEContextSchemeCPA::loadMasterSecretParams(const string &mskID,
  *
  * @param[in]	identifier for the secret key in the keystore.
  * @param[in]	serialized blob that represents the secret parameters.
- * @param[in]	an optional password to derive a key for decrypting the serialized blob.
+ * @param[in]	an optional password to derive a key for decrypting the
+ * serialized blob.
  * @return  An error code or OpenABE_NOERROR.
  */
 
-OpenABE_ERROR
-OpenABEContextSchemeCPA::loadUserSecretParams(const string &skID,
-                                       OpenABEByteString &skBlob) {
+OpenABE_ERROR OpenABEContextSchemeCPA::loadUserSecretParams(const string& skID,
+                                                            OpenABEByteString& skBlob) {
   return this->loadKey(skID, skBlob, KEY_TYPE_SECRET);
 }
-
 
 /*!
  * Delete a key from the in-memory keystore given a key identifier.
@@ -272,8 +263,7 @@ OpenABEContextSchemeCPA::loadUserSecretParams(const string &skID,
  * @param[in]   a string key identifier.
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::deleteKey(const string keyID) {
+OpenABE_ERROR OpenABEContextSchemeCPA::deleteKey(const string keyID) {
   return this->m_KEM_->getKeystore()->deleteKey(keyID);
 }
 
@@ -284,19 +274,18 @@ bool OpenABEContextSchemeCPA::checkSecretKey(const string keyID) {
 /*!
  * Generate a public/private keypair for a given user.
  *
- * @param[in]   functional input of the key to be created (either attribute list or policy).
+ * @param[in]   functional input of the key to be created (either attribute list
+ * or policy).
  * @param[in]   parameter ID of the master public key.
  * @param[in]   parameter ID of the master secret key.
  * @param[in]   parameter ID of the global public key (optional).
  * @param[in]   parameter ID of the global identifier (optional).
  * @return      An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::keygen(OpenABEFunctionInput *keyInput, const string &keyID,
-                         const string &mpkID, const string &mskID,
-                         const string &gpkID, const string &GID) {
-  return this->m_KEM_->generateDecryptionKey(keyInput, keyID, mpkID, mskID,
-                                             gpkID, GID);
+OpenABE_ERROR OpenABEContextSchemeCPA::keygen(OpenABEFunctionInput* keyInput, const string& keyID,
+                                              const string& mpkID, const string& mskID,
+                                              const string& gpkID, const string& GID) {
+  return this->m_KEM_->generateDecryptionKey(keyInput, keyID, mpkID, mskID, gpkID, GID);
 }
 
 /*!
@@ -304,17 +293,20 @@ OpenABEContextSchemeCPA::keygen(OpenABEFunctionInput *keyInput, const string &ke
  * of the underlying KEM scheme. Use the symmetric key with PRNG to encrypt
  * the plaintext. Return the ciphertext.
  *
- * @param[in]   random number generator to use during encryption (it is optional: could be set to NULL here).
- * @param[in]	master public key identifier in keystore for the recipient (assumes it's already in keystore).
- * @param[in]   functional input of the underlying KEM context (either attribute list or policy).
+ * @param[in]   random number generator to use during encryption (it is
+ * optional: could be set to NULL here).
+ * @param[in]	master public key identifier in keystore for the recipient
+ * (assumes it's already in keystore).
+ * @param[in]   functional input of the underlying KEM context (either attribute
+ * list or policy).
  * @param[in]   the plaintext.
  * @param[out]	the ciphertext (must be allocated).
  * @return  An error code or OpenABE_NOERROR.
  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::encrypt(OpenABERNG *rng, const string &mpkID,
-                          const OpenABEFunctionInput *encryptInput,
-                          OpenABEByteString *plaintext, OpenABECiphertext *ciphertext) {
+OpenABE_ERROR OpenABEContextSchemeCPA::encrypt(OpenABERNG* rng, const string& mpkID,
+                                               const OpenABEFunctionInput* encryptInput,
+                                               OpenABEByteString* plaintext,
+                                               OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABESymKey> K(new OpenABESymKey);
   unique_ptr<OpenABERNG> PRNG = nullptr;
@@ -324,8 +316,8 @@ OpenABEContextSchemeCPA::encrypt(OpenABERNG *rng, const string &mpkID,
     ASSERT_NOTNULL(plaintext);
     ASSERT_NOTNULL(ciphertext);
     // generate Key Encapsulation for access structure under MPK
-    result = this->m_KEM_->encryptKEM(rng, mpkID, encryptInput,
-                                      DEFAULT_SYM_KEY_BYTES, K, ciphertext);
+    result =
+        this->m_KEM_->encryptKEM(rng, mpkID, encryptInput, DEFAULT_SYM_KEY_BYTES, K, ciphertext);
     ASSERT(result == OpenABE_NOERROR, result);
     // compute H_0(K) to get initial seed for PRNG
     uint32_t target_len = plaintext->size();
@@ -346,38 +338,38 @@ OpenABEContextSchemeCPA::encrypt(OpenABERNG *rng, const string &mpkID,
     // cout << "encryptedData: " << y->toHex() << endl;
     hashK.zeroize();
     K->zeroize();
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
   return result;
 }
 
- /*!
-  * Decrypt a symmetric key using the key encapsulation mode
-  * of the underlying scheme. Use the key with PRNG to decrypt
-  * the other half of the ciphertext payload. Return the plaintext.
-  *
-  * @param[in]   master public key identifier of the sender (assumes it's already in keystore).
-  * @param[in]   key identifier of recipient (assumes it's already in keystore).
-  * @param[out]  OpenABEByteString object to store resulting plaintext (assumes it's already allocated).
-  * @param[in]   the ciphertext.
-  * @return  An error code or OpenABE_NOERROR.
-  */
-OpenABE_ERROR
-OpenABEContextSchemeCPA::decrypt(const string &mpkID, const string &keyID,
-                          OpenABEByteString *plaintext, OpenABECiphertext *ciphertext) {
+/*!
+ * Decrypt a symmetric key using the key encapsulation mode
+ * of the underlying scheme. Use the key with PRNG to decrypt
+ * the other half of the ciphertext payload. Return the plaintext.
+ *
+ * @param[in]   master public key identifier of the sender (assumes it's already
+ * in keystore).
+ * @param[in]   key identifier of recipient (assumes it's already in keystore).
+ * @param[out]  OpenABEByteString object to store resulting plaintext (assumes
+ * it's already allocated).
+ * @param[in]   the ciphertext.
+ * @return  An error code or OpenABE_NOERROR.
+ */
+OpenABE_ERROR OpenABEContextSchemeCPA::decrypt(const string& mpkID, const string& keyID,
+                                               OpenABEByteString* plaintext,
+                                               OpenABECiphertext* ciphertext) {
   OpenABE_ERROR result = OpenABE_NOERROR;
   shared_ptr<OpenABESymKey> K(new OpenABESymKey);
   unique_ptr<OpenABERNG> PRNG = nullptr;
 
   try {
-    result = this->m_KEM_->decryptKEM(mpkID, keyID, ciphertext,
-                                      DEFAULT_SYM_KEY_BYTES, K);
+    result = this->m_KEM_->decryptKEM(mpkID, keyID, ciphertext, DEFAULT_SYM_KEY_BYTES, K);
     ASSERT(result == OpenABE_NOERROR, result);
     // retrieve encrypted data
-    OpenABEByteString *encMessage =
-        ciphertext->getByteString("_ED"); // encryptedData
+    OpenABEByteString* encMessage = ciphertext->getByteString("_ED"); // encryptedData
     if (encMessage == nullptr) {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
@@ -399,10 +391,10 @@ OpenABEContextSchemeCPA::decrypt(const string &mpkID, const string &keyID,
     // zeroize
     hashK.zeroize();
     K->zeroize();
-  } catch (OpenABE_ERROR &error) {
+  } catch (OpenABE_ERROR& error) {
     result = error;
   }
 
   return result;
 }
-}
+} // namespace oabe

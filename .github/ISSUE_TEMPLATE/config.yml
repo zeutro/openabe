@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/Claudiocli/openabe/security/advisories/new
+    about: Please report vulnerabilities privately, never in a public issue.
+  - name: Documentation and FAQ
+    url: https://github.com/Claudiocli/openabe/wiki
+    about: Guides, tutorials, policy syntax and troubleshooting.

@@ -1,0 +1,35 @@
+# Line endings.
+#
+# This build is shell and make all the way down: deps/install_pkgs.sh, the
+# `env` file sourced before it, and every Makefile are read by bash or by GNU
+# make, and neither tolerates a trailing carriage return. With
+# core.autocrlf=true - common on Windows - a checkout hands them CRLF, and
+# `git archive` carries that straight into a build context, where it surfaces
+# as `install_pkgs.sh: line 2: $'\r': command not found` long before anything
+# is compiled.
+#
+# The index is already entirely LF, so `text=auto` normalizes nothing that is
+# committed today - it only governs what future commits store.
+
+* text=auto
+
+# Read by a shell or by make: LF in every working tree, on every platform.
+*.sh            text eol=lf
+*.mk            text eol=lf
+Makefile        text eol=lf
+Makefile.*      text eol=lf
+env             text eol=lf
+*.env           text eol=lf
+
+# Never rewritten, whatever a platform would prefer.
+*.pdf           binary
+*.png           binary
+*.jpg           binary
+*.gz            binary
+*.tgz           binary
+*.zip           binary
+*.a             binary
+*.so            binary
+*.dll           binary
+*.dylib         binary
+*.exe           binary

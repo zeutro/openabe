@@ -1,0 +1,228 @@
+name: OpenABE build and tests
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+  schedule:
+    - cron: "22 4 * * 4"
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux - GCC build and tests
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            gcc \
+            g++ \
+            make \
+            bison \
+            flex \
+            libfl-dev \
+            pkg-config \
+            libgmp-dev \
+            libssl-dev \
+            libboost-system-dev \
+            libboost-thread-dev \
+            libgtest-dev \
+            python3 \
+            python3-pip \
+            python3-dev \
+            python3-venv \
+            ca-certificates \
+            git \
+            wget \
+            unzip \
+            cmake
+
+      - name: Configure OpenABE environment
+        shell: bash
+        run: |
+          source ./env
+          echo "ZROOT=$ZROOT" >> "$GITHUB_ENV"
+          # GITHUB_PATH takes bare directory entires
+          echo "$ZROOT/src" >> "$GITHUB_PATH"
+          echo "$ZROOT/cli" >> "$GITHUB_PATH"
+          echo "$ZROOT/examples" >> "$GITHUB_PATH"
+
+      - name: Build OpenABE and all tools
+        shell: bash
+        run: |
+          source ./env
+          make
+
+      # deps/relic/Makefile builds RELIC twice into one prefix
+      - name: Check RELIC ec symbol isolation
+        shell: bash
+        run: |
+          set -e
+          source ./env
+
+          ./deps/relic/check_ec_symbols.sh deps/root/lib
+
+          echo "Checking the linked library for duplicate RELIC symbols"
+          dupes=$(comm -12 \
+            <(nm -g --defined-only deps/root/lib/librelic_s_ec.a 2>/dev/null | awk '$2 ~ /^[A-Z]$/ {print $3}' | sort -u) \
+            <(nm -g --defined-only deps/root/lib/librelic_s.a    2>/dev/null | awk '$2 ~ /^[A-Z]$/ {print $3}' | sort -u))
+
+          if [ -n "$dupes" ]; then
+            echo "ERROR: these symbols are defined in both RELIC builds:" >&2
+            echo "$dupes" >&2
+            exit 1
+          fi
+
+          echo "No symbol is defined by both RELIC builds"
+
+      - name: Run OpenABE unit tests
+        shell: bash
+        run: |
+          source ./env
+          make test
+
+      - name: Run C++ examples
+        shell: bash
+        run: |
+          source ./env
+          make -C examples test
+
+        # Nothing really exercises the Cython extension
+      - name: Run the Python bindings
+        shell: bash
+        run: |
+          set -e
+          source ./env
+
+          python3 -m venv "$RUNNER_TEMP/venv"
+          source "$RUNNER_TEMP/venv/bin/activate"
+          pip install --no-cache-dir -r bindings/python/requirements.txt setuptools
+
+          cd bindings/python
+          python3 setup.py build_ext --inplace
+          python3 test.py
+
+      - name: Test CLI utilities
+        shell: bash
+        run: |
+          set -e
+          source ./env
+
+          cd cli
+          printf "hello world!\n" > input.txt
+
+          ./oabe_keygen -s PK -i alice
+          ./oabe_keygen -s PK -i bob
+
+          ./oabe_enc \
+            -s PK \
+            -e alice \
+            -r bob \
+            -i input.txt \
+            -o input.pkenc
+
+          ./oabe_dec \
+            -s PK \
+            -e alice \
+            -r bob \
+            -i input.pkenc \
+            -o output.txt
+
+          cmp input.txt output.txt
+
+          echo "CLI PK encryption test passed"
+
+  windows:
+    name: Windows - MinGW/MSYS2 build and tests
+    runs-on: windows-2022
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install MSYS2 and MinGW dependencies
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            git
+            make
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-gmp
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-gtest
+            bison
+            flex
+            python
+            python-pip
+
+      - name: Check compiler
+        run: |
+          gcc --version
+          g++ --version
+          make --version
+
+      - name: Build OpenABE and all tools
+        run: |
+          set -e
+          source ./env
+          make
+
+      - name: Run OpenABE unit tests
+        run: |
+          set -e
+          source ./env
+          make test
+
+      - name: Run C++ examples
+        run: |
+          set -e
+          source ./env
+          make -C examples test
+
+      - name: Test CLI utilities
+        run: |
+          set -e
+          source ./env
+
+          cd cli
+          printf "hello world!\n" > input.txt
+
+          ./oabe_keygen.exe -s PK -i alice
+          ./oabe_keygen.exe -s PK -i bob
+
+          ./oabe_enc.exe \
+            -s PK \
+            -e alice \
+            -r bob \
+            -i input.txt \
+            -o input.pkenc
+
+          ./oabe_dec.exe \
+            -s PK \
+            -e alice \
+            -r bob \
+            -i input.pkenc \
+            -o output.txt
+
+          cmp input.txt output.txt
+
+          echo "CLI PK encryption test passed"

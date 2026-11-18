@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -43,12 +43,11 @@
 using namespace std;
 using namespace oabe;
 
-bool TestPolicy(const char *str)
-{
+bool TestPolicy(const char* str) {
   string policy_str(str);
   std::unique_ptr<OpenABEPolicy> policy = createPolicyTree(policy_str);
 
-  if(policy != nullptr) {
+  if (policy != nullptr) {
     cout << "Policy Full: " << policy->toString() << endl;
     cout << "Policy Compact: " << policy->toCompactString() << endl;
 
@@ -63,7 +62,7 @@ bool TestPolicy(const char *str)
   return false;
 }
 
-bool TestAttributeList(const char *str) {
+bool TestAttributeList(const char* str) {
   try {
     std::unique_ptr<OpenABEAttributeList> attrList = createAttributeList(str);
     if (attrList != nullptr) {
@@ -74,18 +73,18 @@ bool TestAttributeList(const char *str) {
 
       cout << "AttrList2 Full: " << attrList2->toString() << endl;
       cout << "AttrList2 Compact: " << attrList2->toCompactString() << endl;
-      const vector<string> *raw_attrs = attrList->getAttributeList();
+      const vector<string>* raw_attrs = attrList->getAttributeList();
       cout << "Number of raw attributes: " << raw_attrs->size() << endl;
       return true;
     }
-  } catch(OpenABE_ERROR & error) {
-      cerr << "Error: " << OpenABE_errorToString(error) << endl;
+  } catch (OpenABE_ERROR& error) {
+    cerr << "Error: " << OpenABE_errorToString(error) << endl;
   }
   return false;
 }
 
 bool TestCheckSatisfy(const string& policy_str, const string& attributes, bool verbose) {
-  pair<bool,int> result;
+  pair<bool, int> result;
   try {
     std::unique_ptr<OpenABEPolicy> policy = createPolicyTree(policy_str);
     std::unique_ptr<OpenABEAttributeList> attrList = createAttributeList(attributes);
@@ -105,42 +104,42 @@ bool TestCheckSatisfy(const string& policy_str, const string& attributes, bool v
     } else {
       throw OpenABE_ERROR_INVALID_INPUT;
     }
-  } catch(OpenABE_ERROR& error) {
+  } catch (OpenABE_ERROR& error) {
     cout << "Error: " << OpenABE_errorToString(error) << endl;
   }
   return false;
 }
 
-int main(int argc, char **argv)
-{
-    bool verbose = false;
-    if(argc < 3) {
-      cout << "Usage " << string(argv[0]) << ": [ policy, attributes or logic ] [ input args ] [ verbose ]" << endl;
-      exit(-1);
-    }
-    const string cmd(argv[1]);
+int main(int argc, char** argv) {
+  bool verbose = false;
+  if (argc < 3) {
+    cout << "Usage " << string(argv[0])
+         << ": [ policy, attributes or logic ] [ input args ] [ verbose ]" << endl;
+    exit(-1);
+  }
+  const string cmd(argv[1]);
 
-    if (cmd == "policy") {
-       return (TestPolicy(argv[2]) ? 0 : 1);
-    } else if(cmd == "attributes") {
-       return (TestAttributeList(argv[2]) ? 0 : 1);
-    } else if(cmd == "logic") {
-      if (argc == 5) {
-        const string verb = argv[4];
-        if (verb == "true") {
-            verbose = true;
-        }
-      } else if (argc < 4) {
-        cout << "expecting a 'policy' and an 'attribute list'" << endl;
-        return -1;
+  if (cmd == "policy") {
+    return (TestPolicy(argv[2]) ? 0 : 1);
+  } else if (cmd == "attributes") {
+    return (TestAttributeList(argv[2]) ? 0 : 1);
+  } else if (cmd == "logic") {
+    if (argc == 5) {
+      const string verb = argv[4];
+      if (verb == "true") {
+        verbose = true;
       }
-      const string policy_str = argv[2];
-      const string attr_list = argv[3];
-      return (TestCheckSatisfy(policy_str, attr_list, verbose) ? 0 : 1);
-    } else {
-      cout << "Command Options: 'policy', 'attributes' or 'logic' " << endl;
-      exit(-1);
+    } else if (argc < 4) {
+      cout << "expecting a 'policy' and an 'attribute list'" << endl;
+      return -1;
     }
+    const string policy_str = argv[2];
+    const string attr_list = argv[3];
+    return (TestCheckSatisfy(policy_str, attr_list, verbose) ? 0 : 1);
+  } else {
+    cout << "Command Options: 'policy', 'attributes' or 'logic' " << endl;
+    exit(-1);
+  }
 
   return -1;
 }

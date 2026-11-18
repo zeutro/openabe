@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -43,14 +43,13 @@
 using namespace std;
 using namespace oabe;
 
-#define TEST_MSG_LEN                32
-#define DEFAULT_PARAMETER_STRING    "NIST_P256"
+#define TEST_MSG_LEN 32
+#define DEFAULT_PARAMETER_STRING "NIST_P256"
 #define TEST_DESCRIPTION(desc) RecordProperty("description", desc)
 #define TESTSUITE_DESCRIPTION(desc) ::testing::Test::RecordProperty("description", desc)
 
-
 TEST(PK_ODPH, TestCCASecurityForScheme) {
-    TEST_DESCRIPTION("Testing CCA-secure PK OPDH context with randomly generated messages");
+  TEST_DESCRIPTION("Testing CCA-secure PK OPDH context with randomly generated messages");
   OpenABEByteString bytes, ctBlob, hdr1, hdr2;
   string plaintext1, plaintext2;
   OpenABECiphertext ciphertext, ciphertext2;
@@ -58,7 +57,8 @@ TEST(PK_ODPH, TestCCASecurityForScheme) {
   rng.getRandomBytes(&bytes, TEST_MSG_LEN);
   plaintext1 = bytes.toString();
   // create new KEM context for PKE ECC MQV scheme
-  unique_ptr<OpenABEContextSchemePKE> schemeContext = OpenABE_createContextPKESchemeCCA(OpenABE_SCHEME_PK_OPDH);
+  unique_ptr<OpenABEContextSchemePKE> schemeContext =
+      OpenABE_createContextPKESchemeCCA(OpenABE_SCHEME_PK_OPDH);
   ASSERT_TRUE(schemeContext != nullptr);
 
   // Generate a set of parameters for an ABE authority
@@ -94,7 +94,8 @@ TEST(PK_ODPH, TestCCASecurityForScheme) {
   // attempt to load a key that was just deleted
   ASSERT_TRUE(schemeContext->loadPrivateKey("private_B", privateKeyB) == OpenABE_NOERROR);
 
-  ASSERT_TRUE(schemeContext->encrypt(NULL, "public_B", "public_A", plaintext1, &ciphertext) == OpenABE_NOERROR);
+  ASSERT_TRUE(schemeContext->encrypt(NULL, "public_B", "public_A", plaintext1, &ciphertext) ==
+              OpenABE_NOERROR);
 
   ciphertext.exportToBytes(ctBlob);
   ciphertext2.loadFromBytes(ctBlob);
@@ -104,13 +105,13 @@ TEST(PK_ODPH, TestCCASecurityForScheme) {
   ciphertext2.getHeader(hdr2);
   ASSERT_TRUE(hdr1 == hdr2);
 
-  ASSERT_TRUE(schemeContext->decrypt("public_A", "private_B", plaintext2, &ciphertext2) == OpenABE_NOERROR);
+  ASSERT_TRUE(schemeContext->decrypt("public_A", "private_B", plaintext2, &ciphertext2) ==
+              OpenABE_NOERROR);
 
   ASSERT_TRUE(plaintext1.compare(plaintext2) == 0);
 }
 
-
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   int rc;
 
   InitializeOpenABE();

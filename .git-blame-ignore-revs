@@ -1,0 +1,5 @@
+# Formatting-only commits, skipped by `git blame` (GitHub applies this file automatically).
+# Locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: apply clang-format to the codebase
+bbd4e3b70f3d78006412b7d514a7d62e432a84fe

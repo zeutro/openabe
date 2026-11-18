@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -34,27 +34,30 @@
 #ifndef __ZPRNG_H__
 #define __ZPRNG_H__
 
+#include <cstdint>
+
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 #include <mutex>
 
-#define OpenABE_CTR_DRBG_BLOCKSIZE         16      /* Cipher Block size */
-#define OpenABE_CTR_DRBG_KEYSIZE_BYTES     32      /* Cipher Key size in bytes */
-#define OpenABE_CTR_DRBG_KEYSIZE_BITS      ( OpenABE_CTR_DRBG_KEYSIZE_BYTES * 8 )
-#define OpenABE_CTR_DRBG_SEEDLEN           ( OpenABE_CTR_DRBG_KEYSIZE_BYTES + OpenABE_CTR_DRBG_BLOCKSIZE )
-#define OpenABE_CTR_DRBG_NONCELEN          16      /* Default nonce length */
-#define OpenABE_CTR_DRBG_ENTROPYLEN        32      /* Amount of entropy used per seed by default
-                                                  (32 with SHA-256, 48 with SHA-512, etc) */
+#define OpenABE_CTR_DRBG_BLOCKSIZE 16     /* Cipher Block size */
+#define OpenABE_CTR_DRBG_KEYSIZE_BYTES 32 /* Cipher Key size in bytes */
+#define OpenABE_CTR_DRBG_KEYSIZE_BITS (OpenABE_CTR_DRBG_KEYSIZE_BYTES * 8)
+#define OpenABE_CTR_DRBG_SEEDLEN (OpenABE_CTR_DRBG_KEYSIZE_BYTES + OpenABE_CTR_DRBG_BLOCKSIZE)
+#define OpenABE_CTR_DRBG_NONCELEN 16 /* Default nonce length */
+/* Amount of entropy used per seed by default (32 with SHA-256, 48 with SHA-512, etc) */
+#define OpenABE_CTR_DRBG_ENTROPYLEN 32
 
-#define OpenABE_CTR_DRBG_RESEED_INTERVAL    10000   /* Interval before re-seed is performed by default */
-#define OpenABE_CTR_DRBG_MAX_INPUT_LENGTH   256     /* Maximum number of additional input bytes */
-#define OpenABE_CTR_DRBG_MAX_REQUEST        1024    /* Maximum number of requested bytes per call */
-#define OpenABE_CTR_DRBG_MAX_SEED_INPUT     384     /* Maximum size of (re)seed buffer */
+/* Interval before re-seed is performed by default */
+#define OpenABE_CTR_DRBG_RESEED_INTERVAL 10000
+#define OpenABE_CTR_DRBG_MAX_INPUT_LENGTH 256 /* Maximum number of additional input bytes */
+#define OpenABE_CTR_DRBG_MAX_REQUEST 1024     /* Maximum number of requested bytes per call */
+#define OpenABE_CTR_DRBG_MAX_SEED_INPUT 384   /* Maximum size of (re)seed buffer */
 
-#define OpenABE_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED  -0x0034  /* The entropy source failed. */
-#define OpenABE_ERR_CTR_DRBG_REQUEST_TOO_BIG        -0x0036  /* Too many random requested in single call. */
-#define OpenABE_ERR_CTR_DRBG_INPUT_TOO_BIG          -0x0038  /* Input too large (Entropy + additional). */
-
+#define OpenABE_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED -0x0034 /* The entropy source failed. */
+/* Too many random requested in single call. */
+#define OpenABE_ERR_CTR_DRBG_REQUEST_TOO_BIG -0x0036
+#define OpenABE_ERR_CTR_DRBG_INPUT_TOO_BIG -0x0038 /* Input too large (Entropy + additional). */
 
 /// \class	OpenABERNG
 /// \brief	Abstract base class class for generating randomness
@@ -62,19 +65,22 @@ namespace oabe {
 
 class OpenABERNG : public ZObject {
 public:
-	OpenABERNG();
-	~OpenABERNG();
+  OpenABERNG();
+  ~OpenABERNG();
 
-	virtual void setSeed(OpenABEByteString& nonce) { return; }
-	virtual int getRandomBytes(uint8_t *buf, size_t buf_len) {
-	    ASSERT_RNG(RAND_bytes(buf, buf_len)); return 1;
-	}
-	virtual int getRandomBytes(OpenABEByteString *buf, size_t buf_len) {
-		buf->clear();
-		buf->fillBuffer(0, buf_len);
-		ASSERT_RNG(RAND_bytes(buf->getInternalPtr(), buf_len));
-		return 1;
-	}
+  virtual void setSeed(OpenABEByteString& nonce) {
+    return;
+  }
+  virtual int getRandomBytes(uint8_t* buf, size_t buf_len) {
+    ASSERT_RNG(RAND_bytes(buf, buf_len));
+    return 1;
+  }
+  virtual int getRandomBytes(OpenABEByteString* buf, size_t buf_len) {
+    buf->clear();
+    buf->fillBuffer(0, buf_len);
+    ASSERT_RNG(RAND_bytes(buf->getInternalPtr(), buf_len));
+    return 1;
+  }
 };
 
 struct OpenABECtrDrbg_ {
@@ -84,9 +90,9 @@ struct OpenABECtrDrbg_ {
   size_t entropy_len;
 
   // Callbacks (Entropy)
-  int (*entropy_callback)(void *, uint8_t *, size_t);
+  int (*entropy_callback)(void*, uint8_t*, size_t);
   //  context for the entropy function
-  void *entropy_src;
+  void* entropy_src;
 };
 typedef std::shared_ptr<OpenABECtrDrbg_> OpenABECtrDrbg;
 
@@ -101,7 +107,7 @@ typedef std::shared_ptr<OpenABECtrDrbg_> OpenABECtrDrbg;
  *                      only the first OpenABE_CTR_DRBG_MAX_SEED_INPUT bytes are used,
  *                      the remaining bytes are discarded.
  */
-void ctr_drbg_update(OpenABECtrDrbg& ctx, const uint8_t *additional, size_t add_len);
+void ctr_drbg_update(OpenABECtrDrbg& ctx, const uint8_t* additional, size_t add_len);
 
 /*!
  * \brief               CTR_DRBG re-seeding (extracts data from entropy source)
@@ -113,7 +119,7 @@ void ctr_drbg_update(OpenABECtrDrbg& ctx, const uint8_t *additional, size_t add_
  * \return              0 if successful, or
  *                      OpenABE_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED
  */
-int ctr_drbg_reseed(OpenABECtrDrbg& ctx, const uint8_t *additional, size_t len);
+int ctr_drbg_reseed(OpenABECtrDrbg& ctx, const uint8_t* additional, size_t len);
 
 /*!
  * \brief               CTR_DRBG generate random with additional update input
@@ -130,8 +136,8 @@ int ctr_drbg_reseed(OpenABECtrDrbg& ctx, const uint8_t *additional, size_t len);
  *                      OpenABE_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED, or
  *                      OpenABE_ERR_CTR_DRBG_REQUEST_TOO_BIG
  */
-int ctr_drbg_generate_random_with_add(OpenABECtrDrbg& ctx, uint8_t *output, size_t output_len,
-                                      const uint8_t *additional, size_t add_len);
+int ctr_drbg_generate_random_with_add(OpenABECtrDrbg& ctx, uint8_t* output, size_t output_len,
+                                      const uint8_t* additional, size_t add_len);
 /*!
  * \brief               CTR_DRBG initial seeding
  *                      Seed and setup entropy source for future reseeds.
@@ -149,11 +155,8 @@ int ctr_drbg_generate_random_with_add(OpenABECtrDrbg& ctx, uint8_t *output, size
  *
  * \return 0 if successful, or OpenABE_ERR_CTR_DRBG_ENTROPY_SOURCE_FAILED
  */
-int ctr_drbg_init_seed(OpenABECtrDrbg& ctx,
-                  int (*entropy_callback)(void *, uint8_t *, size_t),
-                  void *entropy_buf,
-                  const uint8_t *person_str,
-                  size_t len);
+int ctr_drbg_init_seed(OpenABECtrDrbg& ctx, int (*entropy_callback)(void*, uint8_t*, size_t),
+                       void* entropy_buf, const uint8_t* person_str, size_t len);
 
 /// \class  OpenABECtrDrbgContext
 /// \brief  Class/Context implementation for CTR_DRBG NIST Standard
@@ -166,21 +169,21 @@ private:
   std::mutex lock_;
 
 public:
-  OpenABECtrDrbgContext(OpenABEByteString &entropy);
-  OpenABECtrDrbgContext(const uint8_t *entropy, uint32_t entropy_len);
+  OpenABECtrDrbgContext(OpenABEByteString& entropy);
+  OpenABECtrDrbgContext(const uint8_t* entropy, uint32_t entropy_len);
   ~OpenABECtrDrbgContext();
 
   // for nist self test
-  void initSeed(int (*entropy_callback)(void *, uint8_t *, size_t),
-                const uint8_t *nonce, size_t nonce_len);
+  void initSeed(int (*entropy_callback)(void*, uint8_t*, size_t), const uint8_t* nonce,
+                size_t nonce_len);
   // uses short_entropy
-  void initSeed(const uint8_t *nonce, size_t nonce_len);
+  void initSeed(const uint8_t* nonce, size_t nonce_len);
 
-  int reSeed(const uint8_t *buf_ptr, size_t buf_len);
-  int reSeed(OpenABEByteString *buf);
+  int reSeed(const uint8_t* buf_ptr, size_t buf_len);
+  int reSeed(OpenABEByteString* buf);
 
-  int getRandomBytes(uint8_t *buf, size_t buf_len);
-  int getRandomBytes(OpenABEByteString *buf, size_t buf_len);
+  int getRandomBytes(uint8_t* buf, size_t buf_len);
+  int getRandomBytes(OpenABEByteString* buf, size_t buf_len);
 };
 
 /// \class  OpenABECTR_DRBG
@@ -191,16 +194,15 @@ private:
   std::unique_ptr<OpenABECtrDrbgContext> ctrDrbgContext_;
 
 public:
-  OpenABECTR_DRBG(OpenABEByteString &entropy);
-  OpenABECTR_DRBG(uint8_t *key, uint32_t key_len);
-  ~OpenABECTR_DRBG() { };
+  OpenABECTR_DRBG(OpenABEByteString& entropy);
+  OpenABECTR_DRBG(uint8_t* key, uint32_t key_len);
+  ~OpenABECTR_DRBG() {};
 
   void setSeed(OpenABEByteString& nonce);
-  int getRandomBytes(uint8_t *buf, size_t buf_len);
-  int getRandomBytes(OpenABEByteString *buf, size_t buf_len);
+  int getRandomBytes(uint8_t* buf, size_t buf_len);
+  int getRandomBytes(OpenABEByteString* buf, size_t buf_len);
 };
 
-
-}
+} // namespace oabe
 
 #endif /* ifdef __ZPRNG_H__ */

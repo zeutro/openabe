@@ -1,21 +1,21 @@
-/// 
+///
 /// Copyright (c) 2018 Zeutro, LLC. All rights reserved.
-/// 
+///
 /// This file is part of Zeutro's OpenABE.
-/// 
+///
 /// OpenABE is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published by
 /// the Free Software Foundation, either version 3 of the License, or
 /// (at your option) any later version.
-/// 
+///
 /// OpenABE is distributed in the hope that it will be useful,
 /// but WITHOUT ANY WARRANTY; without even the implied warranty of
 /// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 /// GNU Affero General Public License for more details.
-/// 
+///
 /// You should have received a copy of the GNU Affero General Public
 /// License along with OpenABE. If not, see <http://www.gnu.org/licenses/>.
-/// 
+///
 /// You can be released from the requirements of the GNU Affero General
 /// Public License and obtain additional features by purchasing a
 /// commercial license. Buying such a license is mandatory if you
@@ -62,8 +62,8 @@ typedef enum _OpenABEFunctionInputType {
 
 class OpenABEFunctionInput : public ZObject {
 protected:
-  OpenABEFunctionInputType   m_Type;
-  std::set<std::string>  m_prefixSet;
+  OpenABEFunctionInputType m_Type;
+  std::set<std::string> m_prefixSet;
 
 public:
   // Constructors/destructors
@@ -77,16 +77,20 @@ public:
     return (it != m_prefixSet.end());
   }
 
-  const std::set<std::string>& getPrefixSet() { return this->m_prefixSet; }
-  OpenABEFunctionInputType getFunctionType() const { return this->m_Type; }
+  const std::set<std::string>& getPrefixSet() {
+    return this->m_prefixSet;
+  }
+  OpenABEFunctionInputType getFunctionType() const {
+    return this->m_Type;
+  }
   virtual std::string toString() const = 0;
   virtual std::string toCompactString() const = 0;
 };
 
 // perform deep copy of a function input
 std::unique_ptr<OpenABEFunctionInput> copyFunctionInput(const OpenABEFunctionInput& input);
-std::unique_ptr<OpenABEFunctionInput> getFunctionInput(OpenABECiphertext *ciphertext);
+std::unique_ptr<OpenABEFunctionInput> getFunctionInput(OpenABECiphertext* ciphertext);
 
-}
+} // namespace oabe
 
 #endif /* ifdef  __ZFUNCTIONINPUT_H__ */
